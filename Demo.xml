@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Demo</name>
+    </assembly>
+    <members>
+        <member name="T:Demo.Controllers.AuthorsController">
+            <summary>
+            Контроллер авторов
+            </summary>
+        </member>
+        <member name="M:Demo.Controllers.AuthorsController.#ctor(Demo.LongPollingQuery{Demo.Model.Author})">
+            <summary>
+            Конструктор
+            </summary>
+            <param name="longpolling"></param>
+        </member>
+        <member name="M:Demo.Controllers.AuthorsController.GetAll">
+            <summary>
+            Получение всех авторов
+            </summary>        
+        </member>
+        <member name="M:Demo.Controllers.AuthorsController.GetById(System.Int32)">
+            <summary>
+            Получить автора по уникальному идентификатору
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+            <example>GET api/Authors/1</example>
+        </member>
+        <member name="M:Demo.Controllers.AuthorsController.GetBook(System.Int32,System.String)">
+            <summary>
+            Получение книг по уникальному идентификатору и названию
+            </summary>
+            <param name="id"></param>
+            <param name="title"></param>
+            <returns></returns>
+            <example>GET api/Authors/1/Book/Первая книга Васи</example>
+        </member>
+        <member name="M:Demo.Controllers.AuthorsController.GetChanges(System.String)">
+            <summary>
+            Метод чтения реализующий паттерн LongPolling
+            </summary>
+            <param name="marker">маркер после которого происходит чтение данных из очереди</param>
+            <returns>коллекция результат</returns>
+            <example>GET api/Authors/GetChanges/</example>
+        </member>
+        <member name="M:Demo.Controllers.AuthorsController.Create(Demo.Model.Author)">
+            <summary>
+            Создание нового автора
+            </summary>
+            <param name="author">новый автор</param>
+            <example>POST api/Authors</example>
+        </member>
+        <member name="M:Demo.Controllers.AuthorsController.Update(System.Int32,Demo.Model.Author)">
+            <summary>
+            Изменение автора
+            </summary>
+            <param name="id"></param>
+            <param name="author"></param>
+            <example>PUT api/Authors/1</example>
+        </member>
+        <member name="M:Demo.Controllers.AuthorsController.Delete(System.Int32)">
+            <summary>
+            Удаление автора
+            </summary>
+            <param name="id"></param>
+            <example>DELETE api/Authors/1</example>
+        </member>
+        <member name="T:Demo.LongPollingValue`1">
+            <summary>
+            Значение очереди
+            </summary>
+            <typeparam name="K"></typeparam>
+        </member>
+        <member name="P:Demo.LongPollingValue`1.Value">
+            <summary>
+            Текущие занчение
+            </summary>
+        </member>
+        <member name="P:Demo.LongPollingValue`1.Marker">
+            <summary>
+            Маркер по котором считываем новые значения
+            </summary>
+        </member>
+        <member name="P:Demo.LongPollingValue`1.Next">
+            <summary>
+            Следующий элемент в связанном списке
+            </summary>
+        </member>
+        <member name="T:Demo.LongPollingQuery`1">
+            <summary>
+            Очередь реализующаю паттерн LongPolling ( "Длительный Опрос" )
+            </summary>
+            <typeparam name="T">generetic тип очереди</typeparam>
+        </member>
+        <member name="P:Demo.LongPollingQuery`1.TimeOut">
+            <summary>
+            Максимальное время удержания запроса, когда нет подходящих данных
+            </summary>
+        </member>
+        <member name="P:Demo.LongPollingQuery`1.WatchDogTimeOut">
+            <summary>
+            Время устаревания данных в очереди
+            </summary>
+        </member>
+        <member name="M:Demo.LongPollingQuery`1.#ctor">
+            <summary>
+            Конструктор
+            </summary>
+        </member>
+        <member name="M:Demo.LongPollingQuery`1.Add(`0)">
+            <summary>
+            Добавление в очередь
+            </summary>        
+        </member>
+        <member name="M:Demo.LongPollingQuery`1.Read(System.DateTime)">
+            <summary>
+            Чтение из очереди
+            </summary>
+            <param name="marker">маркер после которого происходит чтение данных из очереди</param>        
+            <returns></returns>
+        </member>
+        <member name="T:Demo.Model.Author">
+            <summary>
+            Автор
+            </summary>
+        </member>
+        <member name="P:Demo.Model.Author.Id">
+            <summary>
+            Уникальный идентификатор
+            </summary>
+        </member>
+        <member name="P:Demo.Model.Author.Name">
+            <summary>
+            Имя автора
+            </summary>
+        </member>
+        <member name="P:Demo.Model.Author.Books">
+            <summary>
+            Книги автора
+            </summary>
+        </member>
+    </members>
+</doc>
