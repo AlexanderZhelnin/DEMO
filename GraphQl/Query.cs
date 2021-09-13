@@ -72,7 +72,7 @@ namespace Demo.GraphQl
         /// </summary>
         /// <param name="claimsPrincipal"></param>
         /// <returns></returns>
-        //[Authorize(Roles = new[] { "admin" })]
+        [Authorize(Roles = new[] { "admin" })]
         //[Authorize]
         public bool AuthorizeQuery([Service] IHttpContextAccessor context, ClaimsPrincipal claimsPrincipal)
         {

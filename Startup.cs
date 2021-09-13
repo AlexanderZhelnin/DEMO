@@ -29,6 +29,8 @@ using Microsoft.AspNetCore.Http;
 using HotChocolate.Execution;
 using System.Threading;
 using System.Security.Claims;
+using System.Net.Http;
+using Demo.HttpHandler;
 
 namespace Demo
 {
@@ -51,37 +53,7 @@ namespace Demo
     }
     #endregion
 
-    #region HttpRequestInterceptor
-    public class HttpRequestInterceptor : DefaultHttpRequestInterceptor
-    {
-        public override ValueTask OnCreateAsync(HttpContext context,
-            IRequestExecutor requestExecutor, IQueryRequestBuilder requestBuilder,
-            CancellationToken cancellationToken)
-        {
-            var identity = new ClaimsIdentity();
-            var rolesv = context.User.FindFirstValue("realm_access");
-            if (rolesv != null)
-            {
-                dynamic roles = Newtonsoft.Json.Linq.JObject.Parse(rolesv);
-                foreach (var r in roles.roles)
-                    identity.AddClaim(new Claim(ClaimTypes.Role, r.Value));
-            }
-
-            var namev = context.User.FindFirstValue("preferred_username");
-            if (namev != null)
-                identity.AddClaim(new Claim(ClaimTypes.Name, namev));
-
-
-            //
-
-            context.User.AddIdentity(identity);
-
-            return base.OnCreateAsync(context, requestExecutor, requestBuilder,
-                cancellationToken);
-        }
-    }
-    #endregion
-
+       
     /** **/
     [ExcludeFromCodeCoverage]
     public class Startup
@@ -101,19 +73,27 @@ namespace Demo
         /** Конфигурация сервисов **/
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<LongPollingQuery<Author>>();
-
+            //Добавляем логирование
             services.AddLogging(loggingBuilder =>
             {
-                loggingBuilder.AddConsole()
-                    .AddFilter(DbLoggerCategory.Database.Command.Name, LogLevel.Information);
+                loggingBuilder
+                  //Вывод в консоль
+                  .AddConsole()
+                  //выводим команды SQL
+                  .AddFilter(DbLoggerCategory.Database.Command.Name, LogLevel.Information);
                 loggingBuilder.AddDebug();
             });
 
+            //Добавляем в DI конвеер контекст базы данных, в режиме singleton
+            services.AddSingleton<LongPollingQuery<Author>>();
+            //Добавляем в DI конвеер контекст базы данных, в режиме новый для каждого запроса
             services.AddTransient<DemoContext>();
+            //Добавляем в DI конвеер репозиторий, в режиме новый для каждого запроса
             services.AddTransient<DemoRepository>();
+            //Добавляем в DI конвеер обрабочик запроса, в режиме новый для каждого запроса
+            services.AddTransient<HttpTrackerHandler>();
 
-
+            //Добавляем конфигурацию авторизации
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, config =>
                 {
@@ -128,8 +108,12 @@ namespace Demo
                     config.Audience = "DEMO";
                 });
 
-            services.AddHttpClient("workes", c => c.BaseAddress = new Uri("https://localhost:5051/graphql"));
+            //Регистрируем фабруку для HttpClient "auth"
+            services
+                .AddHttpClient("auth")
+                .AddHttpMessageHandler<HttpTrackerHandler>();
 
+            //Региструруем Entity для Sqlite
             services
                .AddEntityFrameworkSqlite()
                .AddDbContext<DemoContext>
@@ -141,13 +125,16 @@ namespace Demo
                    o.UseSqlite(connection).EnableSensitiveDataLogging(true);
                });
 
+            //Настраиваем параметры для контроллеров
             services
                 .AddControllers(o =>
                 {
+                    //Региструрем обработчик для фильтрации ошибок
                     o.Filters.Add(typeof(ExceptionFilter));
                 })
                 .AddNewtonsoftJson(o =>
                 {
+                    // Праметры серелизации - не серелизуем лишнюю информацию
                     o.SerializerSettings.DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore;
 
                     //o.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
@@ -157,6 +144,7 @@ namespace Demo
             //    o.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             //});
 
+            //Региструруем OpenApi 
             services.AddSwaggerGen(c =>
                 {
                     c.SwaggerDoc("v1", new OpenApiInfo
@@ -178,6 +166,7 @@ namespace Demo
                     c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, Assembly.GetExecutingAssembly().GetName().Name + ".xml"));
                 });
 
+            //Региструруем CORS
             services.AddCors(options =>
             {
                 options.AddPolicy("MyPolicy", builder =>
@@ -190,21 +179,33 @@ namespace Demo
                 });
             });
 
+            //Региструруем доступ к контесту запроса
             services.AddHttpContextAccessor();
 
+            //региструруем кэширование в оперативной памяти
             services.AddMemoryCache();
 
+            //Региструруем GraphQL
             services
                 .AddGraphQLServer()
+                //Интерсептор запроса
                 .AddHttpRequestInterceptor<HttpRequestInterceptor>()
+                //Авторизация
                 .AddAuthorization()
+                //Запросы
                 .AddQueryType<Query>()
+                //Изменения
                 .AddMutationType<Mutation>()
                 //.AddRemoteSchema("workes")
+                //Запросы будут правильно транслироваться в SQL, не запрашиваем лишнее
                 .AddProjections()
+                //добавляем возможность фильтрации
                 .AddFiltering()
+                //добавляем возможность сортировки
                 .AddSorting()
+                //Добавляем функцию автоматических сохранённых запросов
                 .UseAutomaticPersistedQueryPipeline()
+                //Хранилище сохранённых запросов в оперативной памяти
                 .AddInMemoryQueryStorage();
         }
 

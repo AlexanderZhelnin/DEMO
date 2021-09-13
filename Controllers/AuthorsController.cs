@@ -4,12 +4,16 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Demo.Model;
 using Microsoft.AspNetCore.Http;
+using System.Net.Http;
+using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
 
 namespace Demo.Controllers
 {
     /// <summary>
     /// Контроллер авторов
     /// </summary>
+    
     [Route("api/[controller]")]
     [ApiController]
     public class AuthorsController : ControllerBase
@@ -20,17 +24,19 @@ namespace Demo.Controllers
         private readonly LongPollingQuery<Author> _longpolling;
         private readonly DemoContext _ctx;
         private readonly DemoRepository _repository;
+        private readonly IHttpClientFactory _httpClientFactory;
         #endregion
 
         #region Конструктор
         /// <summary>
         /// Конструктор
         /// </summary>
-        public AuthorsController(LongPollingQuery<Author> longpolling, DemoContext ctx, DemoRepository repository)
+        public AuthorsController(LongPollingQuery<Author> longpolling, DemoContext ctx, DemoRepository repository, IHttpClientFactory httpClientFactory)
         {
             _longpolling = longpolling;
             _ctx = ctx;
             _repository = repository;
+            _httpClientFactory = httpClientFactory;
         }
         #endregion
 
@@ -39,7 +45,16 @@ namespace Demo.Controllers
         /// Получение всех авторов
         /// </summary>        
         [HttpGet("", Name = nameof(GetAll))]
-        public IQueryable<Author> GetAll() => _ctx.Authors;
+        public async Task<IQueryable<Author>> GetAll()
+        {
+            var demoClient = new Client.DemoClient("http://localhost:5004", _httpClientFactory.CreateClient("auth"));
+
+            var bs = await demoClient.GetByIdAsync(1);
+
+            //var responce = await _httpClientFactory.CreateClient("auth").GetAsync("http://localhost:5004/api/authors/1");
+            //var result = await responce.Content.ReadAsStringAsync();
+            return _ctx.Authors;
+        }
 
         /// <summary>
         /// Получить автора по уникальному идентификатору
@@ -50,6 +65,7 @@ namespace Demo.Controllers
         [HttpGet("{id}", Name = nameof(GetById))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesDefaultResponseType]
+        [Authorize]
         public ActionResult<Author> GetById(int id)
         {
             var result = _ctx.Authors.FirstOrDefault(a => a.Id == id);
