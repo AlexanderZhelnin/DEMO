@@ -7,20 +7,20 @@ using Microsoft.AspNetCore.Http;
 using System.Net.Http;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Demo.Controllers
 {
     /// <summary>
     /// Контроллер авторов
     /// </summary>
-    
+
     [Route("api/[controller]")]
     [ApiController]
     public class AuthorsController : ControllerBase
     {
-
         #region Переменные
-        internal static int _id = 8;
+        internal static int _id = 20;
         private readonly LongPollingQuery<Author> _longpolling;
         private readonly DemoContext _ctx;
         private readonly DemoRepository _repository;
@@ -40,12 +40,11 @@ namespace Demo.Controllers
         }
         #endregion
 
-
         /// <summary>
-        /// Получение всех авторов
+        /// Тестовая функция с получением данных из "другого" микросервиса, с авторизацией
         /// </summary>        
-        [HttpGet("", Name = nameof(GetAll))]
-        public async Task<IQueryable<Author>> GetAll()
+        [HttpGet("TestTrace", Name = nameof(TestTrace))]
+        public async Task<IQueryable<Author>> TestTrace()
         {
             var demoClient = new Client.DemoClient("http://localhost:5004", _httpClientFactory.CreateClient("auth"));
 
@@ -57,16 +56,26 @@ namespace Demo.Controllers
         }
 
         /// <summary>
+        /// Получение всех авторов
+        /// </summary>        
+        [HttpGet("", Name = nameof(GetAllAuthors))]
+        public IQueryable<Author> GetAllAuthors() =>
+            _ctx.Authors
+            .Include(a => a.Books)
+            .Include(a => a.Publishers);
+
+
+        /// <summary>
         /// Получить автора по уникальному идентификатору
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         /// <example>GET api/Authors/1</example>
-        [HttpGet("{id}", Name = nameof(GetById))]
+        [HttpGet("{id}", Name = nameof(GetAuthorById))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesDefaultResponseType]
         [Authorize]
-        public ActionResult<Author> GetById(int id)
+        public ActionResult<Author> GetAuthorById(int id)
         {
             var result = _ctx.Authors.FirstOrDefault(a => a.Id == id);
 
@@ -120,8 +129,8 @@ namespace Demo.Controllers
         /// </summary>
         /// <param name="author">новый автор</param>
         /// <example>POST api/Authors</example>
-        [HttpPost(Name = nameof(Create))]
-        public void Create([FromBody] Author author)
+        [HttpPost(Name = nameof(CreateAuthor))]
+        public void CreateAuthor([FromBody] Author author)
         {
             author.Id = ++_id;
 
@@ -133,9 +142,9 @@ namespace Demo.Controllers
         /// Изменение автора
         /// </summary>        
         /// <param name="author"></param>
-        /// <example>PUT api/Authors/1</example>
-        [HttpPut("", Name = nameof(Update))]
-        public ActionResult<Author> Update([FromBody] Author author)
+        /// <example>PUT api/Authors</example>
+        [HttpPut("", Name = nameof(UpdateAuthor))]
+        public ActionResult<Author> UpdateAuthor([FromBody] Author author)
         {
             //var existAuthor = _ctx.Authors.FirstOrDefault(a => a.Id == author.Id);
             //if (existAuthor == null)
@@ -169,8 +178,8 @@ namespace Demo.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <example>DELETE api/Authors/1</example>
-        [HttpDelete("{id}", Name = nameof(Delete))]
-        public void Delete(int id)
+        [HttpDelete("{id}", Name = nameof(DeleteAuthor))]
+        public void DeleteAuthor(int id)
         {
         }
     }

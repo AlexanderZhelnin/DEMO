@@ -12,20 +12,25 @@ namespace Demo.Model
     /// </summary>
     public class Author
     {
-        /// <summary>
-        /// Уникальный идентификатор
-        /// </summary>
+
+        /** Уникальный идентификатор */
         public int Id { get; set; }
-        /// <summary>
-        /// Имя автора
-        /// </summary>        
+
+        /** Имя автора */
         [DefaultValue("Вася")]
         public string Name { get; set; }
 
-        /// <summary>
-        /// Книги автора
-        /// </summary>
-        [Authorize(Roles = new[] { "admin" })]
+
+        /** Книги автора */
+        //[Authorize(Roles = new[] { "admin" })]
         public ICollection<Book> Books { get; set; } = new List<Book>();
+
+        /** Издательства */
+        public ICollection<Publisher> Publishers { get; set; } = new List<Publisher>();
+
+        /** Связь многие ко многим Издатели/Авторы */
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
+        public List<PublishersAuthors> PublishersAuthors { get; set; } = new List<PublishersAuthors>();
     }
 }

@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -24,7 +22,7 @@ namespace Demo.HttpHandler
         /** Асинхронный метод вызова */
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            if (_context.HttpContext.Request.Headers.TryGetValue("Authorization", out var jwt))
+             if (_context.HttpContext.Request.Headers.TryGetValue("Authorization", out var jwt))
                 request.Headers.Add("Authorization", jwt.FirstOrDefault());
 
             if (_context.HttpContext.Request.Headers.TryGetValue("TraceId", out var traceid))

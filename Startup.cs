@@ -53,7 +53,7 @@ namespace Demo
     }
     #endregion
 
-       
+
     /** **/
     [ExcludeFromCodeCoverage]
     public class Startup
@@ -119,10 +119,13 @@ namespace Demo
                .AddDbContext<DemoContext>
                (o =>
                {
+
                    var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db.db") }.ToString());
 
                    connection.Open();
-                   o.UseSqlite(connection).EnableSensitiveDataLogging(true);
+                   o.UseSqlite(connection)
+                    .UseSnakeCaseNamingConvention()
+                    .EnableSensitiveDataLogging(true);
                });
 
             //Настраиваем параметры для контроллеров
@@ -136,6 +139,7 @@ namespace Demo
                 {
                     // Праметры серелизации - не серелизуем лишнюю информацию
                     o.SerializerSettings.DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore;
+                    o.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 
                     //o.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
                 });
