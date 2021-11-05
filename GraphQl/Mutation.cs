@@ -1,6 +1,9 @@
 ﻿using Demo.Model;
 using HotChocolate;
+using HotChocolate.Subscriptions;
+using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Demo.GraphQl
 {
@@ -46,8 +49,9 @@ namespace Demo.GraphQl
         /// </summary>
         /// <param name="ctx">Контекст базы данных Entity</param>
         /// <param name="author">Создать или обновить автора</param>
+        /// <param name="sender"></param>
         /// <returns>Автор</returns>        
-        public Author CreateOrUpdate(Author author, [Service] DemoContext ctx)
+        public async Task<Author> CreateOrUpdate(Author author, [Service] DemoContext ctx, [Service] ITopicEventSender sender)
         {
             if (author.Id == 0 || !ctx.Authors.Any(a => a.Id == author.Id))
                 ctx.Add(author);
@@ -55,8 +59,10 @@ namespace Demo.GraphQl
                 ctx.Update(author);
 
             ctx.SaveChanges();
+
+            await sender.SendAsync(nameof(Subscription.OnAuthorChanged), author);
             return author;
-        } 
+        }
         #endregion
 
     }

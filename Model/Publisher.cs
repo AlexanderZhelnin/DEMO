@@ -7,6 +7,10 @@ namespace Demo.Model
     /// </summary>
     public class Publisher
     {
+        public Publisher()
+        {
+
+        }
         /** Уникальный идентификатор */
         public int Id { get; set; }
 

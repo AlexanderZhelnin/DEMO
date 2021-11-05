@@ -182,5 +182,24 @@ namespace Demo.Controllers
         public void DeleteAuthor(int id)
         {
         }
+
+        /// <summary>
+        /// Создание нового автора
+        /// </summary>
+        /// <param name="author">новый автор</param>
+        /// <example>POST api/Authors</example>
+        [HttpPost("upsert", Name = nameof(UpsertAuthor))]
+        public void UpsertAuthor([FromBody] Author author)
+        {
+            //author.Id = ++_id;
+            author.Name ??= "Вася";
+
+            _ctx.Upsert(author).Run();
+            //_ctx.Set<Author>(author).addor
+            //_ctx.Authors.Add(author);
+            //_longpolling.Add(author);
+            //_ctx.SaveChanges();
+        }
+
     }
 }

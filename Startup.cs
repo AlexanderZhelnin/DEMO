@@ -31,6 +31,7 @@ using System.Threading;
 using System.Security.Claims;
 using System.Net.Http;
 using Demo.HttpHandler;
+using HotChocolate;
 
 namespace Demo
 {
@@ -120,7 +121,7 @@ namespace Demo
                (o =>
                {
 
-                   var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db.db") }.ToString());
+                   var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db.db") }.ToString());
 
                    connection.Open();
                    o.UseSqlite(connection)
@@ -167,7 +168,7 @@ namespace Demo
 
                     c.SchemaFilter<EnumSchemeFilter>();
 
-                    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, Assembly.GetExecutingAssembly().GetName().Name + ".xml"));
+                    c.IncludeXmlComments(System.IO.Path.Combine(AppContext.BaseDirectory, Assembly.GetExecutingAssembly().GetName().Name + ".xml"));
                 });
 
             //Региструруем CORS
@@ -189,6 +190,9 @@ namespace Demo
             //региструруем кэширование в оперативной памяти
             services.AddMemoryCache();
 
+            //подписки в памяти
+            services.AddInMemorySubscriptions();
+
             //Региструруем GraphQL
             services
                 .AddGraphQLServer()
@@ -200,6 +204,8 @@ namespace Demo
                 .AddQueryType<Query>()
                 //Изменения
                 .AddMutationType<Mutation>()
+                //Подписки
+                .AddSubscriptionType<Subscription>()
                 //.AddRemoteSchema("workes")
                 //Запросы будут правильно транслироваться в SQL, не запрашиваем лишнее
                 .AddProjections()
@@ -210,7 +216,34 @@ namespace Demo
                 //Добавляем функцию автоматических сохранённых запросов
                 .UseAutomaticPersistedQueryPipeline()
                 //Хранилище сохранённых запросов в оперативной памяти
-                .AddInMemoryQueryStorage();
+                .AddInMemoryQueryStorage()
+                .AddErrorFilter(er =>
+                {
+                    switch (er.Exception)
+                    {
+                        case ArgumentException argexc:
+                            return ErrorBuilder.FromError(er)
+                            .SetMessage(argexc.Message)
+                            .SetCode("ArgumentException")
+                            .RemoveException()
+                            .ClearExtensions()
+                            .ClearLocations()
+                            .Build();
+                        case DbUpdateException dbupdateexc:
+
+                            if (dbupdateexc.InnerException.Message.IndexOf("UNIQUE constraint failed") > -1)
+                                return ErrorBuilder.FromError(er)
+                               .SetMessage(dbupdateexc.InnerException.Message)
+                               .SetCode("UNIQUE constraint failed")
+                               .RemoveException()
+                               .ClearExtensions()
+                               .ClearLocations()
+                               .Build();
+
+                            break;
+                    }
+                    return er;
+                });
         }
 
         #region Configure
@@ -227,6 +260,9 @@ namespace Demo
             // app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseWebSockets();
+
 
             app.UseAuthentication();
             app.UseAuthorization();

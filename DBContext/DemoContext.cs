@@ -16,8 +16,6 @@ namespace Demo.Model
             try
             {
                 Database.EnsureCreated();
-
-
             }
             catch (Exception e)
             {
@@ -59,6 +57,9 @@ namespace Demo.Model
 
             modelBuilder.Entity<Author>(b =>
             {
+                //b.Property(a => a.Id).ValueGeneratedNever();
+                b.HasKey(a => a.Id);
+                b.HasIndex(b => b.Name).IsUnique();
                 #region Данные по умолчанию
                 b.HasData(authors);
                 #endregion
@@ -124,7 +125,6 @@ namespace Demo.Model
             modelBuilder.Entity<BookDetails>(b =>
             {
                 b.HasKey(d => d.BookId);
-
                 // Один к одному
                 b.HasOne(d => d.Book);
 
@@ -217,7 +217,7 @@ namespace Demo.Model
                 // Многие ко многим
                 b
                  .HasMany(p => p.Authors)
-                 .WithMany(a => a.Publishers)                 
+                 .WithMany(a => a.Publishers)
                  .UsingEntity<PublishersAuthors>(
                     author => author
                         .HasOne(pa => pa.Author)
@@ -227,7 +227,7 @@ namespace Demo.Model
                         .HasOne(pa => pa.Publisher)
                         .WithMany(p => p.PublishersAuthors)
                         .HasForeignKey(pa => pa.PublisherId)
-                   );               
+                   );
 
                 b.HasData(publishers);
             });
@@ -240,7 +240,7 @@ namespace Demo.Model
                         new() { PublisherId = 1, AuthorId = 2 },
                         new() { PublisherId = 2, AuthorId = 1 }
                         //new() { PublisherId = 2, AuthorId = 2 }
-                        );            
+                        );
                 #endregion
             });
         }
