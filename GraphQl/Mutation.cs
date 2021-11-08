@@ -12,7 +12,7 @@ namespace Demo.GraphQl
     /// Главное отличие в том что подзапросы выполняются последовательно, в том же порядке что указано в запросе
     /// </summary>
     public class Mutation
-    {
+    {       
         #region Create
         /// <summary>
         /// Создание автора
@@ -64,6 +64,15 @@ namespace Demo.GraphQl
             return author;
         }
         #endregion
+
+        /// <summary>
+        /// Генерация ошибки для проверки транзакции
+        /// </summary>      
+        /// <returns>Автор</returns>        
+        public Author ThrowError()
+        {
+            throw new Exception("Специально сгенерированная ошибка");
+        }
 
     }
 }

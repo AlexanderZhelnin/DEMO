@@ -74,17 +74,23 @@ namespace Demo
         /** Конфигурация сервисов **/
         public void ConfigureServices(IServiceCollection services)
         {
-            //Добавляем логирование
-            services.AddLogging(loggingBuilder =>
-            {
-                loggingBuilder
-                  //Вывод в консоль
-                  .AddConsole()
-                  //выводим команды SQL
-                  .AddFilter(DbLoggerCategory.Database.Command.Name, LogLevel.Information);
-                loggingBuilder.AddDebug();
-            });
 
+            #region Добавляем логирование
+            services.AddLogging(loggingBuilder =>
+                {
+                    //Вывод в консоль
+                    loggingBuilder
+                          .AddConsole()
+                          //выводим команды SQL
+                          .AddFilter(DbLoggerCategory.Database.Command.Name, LogLevel.Information);
+
+                    //Выводим в окно отладки
+                    loggingBuilder
+                          .AddDebug();
+                });
+            #endregion
+
+            #region Регистрируем сервисы
             //Добавляем в DI конвеер контекст базы данных, в режиме singleton
             services.AddSingleton<LongPollingQuery<Author>>();
             //Добавляем в DI конвеер контекст базы данных, в режиме новый для каждого запроса
@@ -93,96 +99,87 @@ namespace Demo
             services.AddTransient<DemoRepository>();
             //Добавляем в DI конвеер обрабочик запроса, в режиме новый для каждого запроса
             services.AddTransient<HttpTrackerHandler>();
+            #endregion
 
-            //Добавляем конфигурацию авторизации
+            #region Добавляем конфигурацию авторизации
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, config =>
-                {
-                    config.TokenValidationParameters = new TokenValidationParameters
+                    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, config =>
                     {
-                        ClockSkew = TimeSpan.FromSeconds(5),
-                        ValidateAudience = false
-                    };
+                        config.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ClockSkew = TimeSpan.FromSeconds(5),
+                            ValidateAudience = false
+                        };
 
-                    config.RequireHttpsMetadata = false;
-                    config.Authority = "http://localhost:8080/auth/realms/SAT/";
-                    config.Audience = "DEMO";
-                });
+                        config.RequireHttpsMetadata = false;
+                        config.Authority = "http://localhost:8080/auth/realms/SAT/";
+                        config.Audience = "DEMO";
+                    });
+            #endregion
 
-            //Регистрируем фабруку для HttpClient "auth"
+            #region Регистрируем фабруку для HttpClient "auth"
             services
-                .AddHttpClient("auth")
-                .AddHttpMessageHandler<HttpTrackerHandler>();
+                    .AddHttpClient("auth")
+                    .AddHttpMessageHandler<HttpTrackerHandler>();
+            #endregion
 
-            //Региструруем Entity для Sqlite
+            #region Настраиваем параметры для контроллеров
             services
-               .AddEntityFrameworkSqlite()
-               .AddDbContext<DemoContext>
-               (o =>
-               {
+                    .AddControllers(o =>
+                    {
+                        //Региструрем обработчик для фильтрации ошибок
+                        o.Filters.Add(typeof(ExceptionFilter));
+                    })
+                    .AddNewtonsoftJson(o =>
+                    {
+                        // Праметры серелизации - не серелизуем лишнюю информацию
+                        o.SerializerSettings.DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore;
+                        o.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 
-                   var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db.db") }.ToString());
-
-                   connection.Open();
-                   o.UseSqlite(connection)
-                    .UseSnakeCaseNamingConvention()
-                    .EnableSensitiveDataLogging(true);
-               });
-
-            //Настраиваем параметры для контроллеров
-            services
-                .AddControllers(o =>
-                {
-                    //Региструрем обработчик для фильтрации ошибок
-                    o.Filters.Add(typeof(ExceptionFilter));
-                })
-                .AddNewtonsoftJson(o =>
-                {
-                    // Праметры серелизации - не серелизуем лишнюю информацию
-                    o.SerializerSettings.DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore;
-                    o.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-
-                    //o.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
-                });
+                        //o.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+                    });
             //.AddJsonOptions(o =>
             //{
             //    o.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-            //});
+            //}); 
+            #endregion
 
-            //Региструруем OpenApi 
+            #region Региструруем OpenApi 
             services.AddSwaggerGen(c =>
-                {
-                    c.SwaggerDoc("v1", new OpenApiInfo
                     {
-                        Title = "Демонстрационное приложение для REST API",
-                        Version = "v1",
-                        Description = "REST, CORS, LongPolling, Routing, ...",
-                        Contact = new OpenApiContact
+                        c.SwaggerDoc("v1", new OpenApiInfo
                         {
-                            Name = "Александр Желнин"
+                            Title = "Демонстрационное приложение для REST API",
+                            Version = "v1",
+                            Description = "REST, CORS, LongPolling, Routing, ...",
+                            Contact = new OpenApiContact
+                            {
+                                Name = "Александр Желнин"
 
-                        }
-                        //, License =
-                        //, TermsOfService = 
+                            }
+                            //, License =
+                            //, TermsOfService = 
+                        });
+
+                        c.SchemaFilter<EnumSchemeFilter>();
+
+                        c.IncludeXmlComments(System.IO.Path.Combine(AppContext.BaseDirectory, Assembly.GetExecutingAssembly().GetName().Name + ".xml"));
                     });
+            #endregion
 
-                    c.SchemaFilter<EnumSchemeFilter>();
-
-                    c.IncludeXmlComments(System.IO.Path.Combine(AppContext.BaseDirectory, Assembly.GetExecutingAssembly().GetName().Name + ".xml"));
-                });
-
-            //Региструруем CORS
+            #region Региструруем CORS
             services.AddCors(options =>
-            {
-                options.AddPolicy("MyPolicy", builder =>
                 {
-                    builder
-                        //.AllowAnyOrigin()
-                        .WithOrigins("http://localhost:4200")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod();
+                    options.AddPolicy("MyPolicy", builder =>
+                    {
+                        builder
+                            //.AllowAnyOrigin()
+                            .WithOrigins("http://localhost:4200")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    });
                 });
-            });
+            #endregion
 
             //Региструруем доступ к контесту запроса
             services.AddHttpContextAccessor();
@@ -190,14 +187,75 @@ namespace Demo
             //региструруем кэширование в оперативной памяти
             services.AddMemoryCache();
 
-            //подписки в памяти
-            services.AddInMemorySubscriptions();
+            #region Entity
+            services.AddPooledDbContextFactory<DemoContext>(ob =>
+                {
+#if SQLITE
+                var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = System.IO.Path.Combine(AppContext.BaseDirectory, "gc.db") }.ToString());
+#else
+                    var connection = new Npgsql.NpgsqlConnection(Configuration.GetConnectionString("DefaultConnection"));
+#endif
 
-            //Региструруем GraphQL
+                    connection.Open();
+                    ob
+#if SQLITE
+                 .UseSqlite(connection)
+#else
+                 .UseNpgsql(connection)
+#endif
+
+                     .UseSnakeCaseNamingConvention()
+                     .EnableSensitiveDataLogging(true);
+
+                });
+            #endregion
+
+            #region MyRegion
+            //#if SQLITE
+            //            //Региструруем Entity для Sqlite
+            //            services
+            //               //.AddEntityFrameworkSqlite()
+            //               .AddDbContext<DemoContext>
+            //               (o =>
+            //               {
+
+            //                   var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db.db") }.ToString());
+
+            //                   connection.Open();
+            //                   o.UseSqlite(connection)
+            //                    .UseSnakeCaseNamingConvention()
+            //                    .EnableSensitiveDataLogging(true);
+            //               });
+            //#else
+            //            //Региструруем Entity для PostgreSQL
+            //            //services
+            //            // .AddDbContext<DemoContext>(ob =>
+            //            // {
+            //            //     var connection = new Npgsql.NpgsqlConnection(Configuration.GetConnectionString("DefaultConnection"));
+            //            //     connection.Open();
+            //            //     ob
+            //            //      .UseNpgsql(connection)
+            //            //      .UseSnakeCaseNamingConvention()
+            //            //      .EnableSensitiveDataLogging(true);
+            //            // });
+            //#endif 
+            #endregion
+
+            #region Региструруем GraphQL
             services
+                //подписки в памяти
+                .AddInMemorySubscriptions()
                 .AddGraphQLServer()
                 //Интерсептор запроса
                 .AddHttpRequestInterceptor<HttpRequestInterceptor>()
+            #region Транзакции
+
+#if !SQLITE
+                //поддержка транзакций
+                //SQLite не поддерживает транзакции
+                .AddDefaultTransactionScopeHandler()
+#endif
+            #endregion
                 //Авторизация
                 .AddAuthorization()
                 //Запросы
@@ -217,33 +275,38 @@ namespace Demo
                 .UseAutomaticPersistedQueryPipeline()
                 //Хранилище сохранённых запросов в оперативной памяти
                 .AddInMemoryQueryStorage()
+            #region Обработка ошибок
                 .AddErrorFilter(er =>
-                {
-                    switch (er.Exception)
-                    {
-                        case ArgumentException argexc:
-                            return ErrorBuilder.FromError(er)
-                            .SetMessage(argexc.Message)
-                            .SetCode("ArgumentException")
-                            .RemoveException()
-                            .ClearExtensions()
-                            .ClearLocations()
-                            .Build();
-                        case DbUpdateException dbupdateexc:
+                        {
+                            switch (er.Exception)
+                            {
+                                case ArgumentException argexc:
+                                    return ErrorBuilder.FromError(er)
+                                    .SetMessage(argexc.Message)
+                                    .SetCode("ArgumentException")
+                                    .RemoveException()
+                                    .ClearExtensions()
+                                    .ClearLocations()
+                                    .Build();
+                                case DbUpdateException dbupdateexc:
 
-                            if (dbupdateexc.InnerException.Message.IndexOf("UNIQUE constraint failed") > -1)
-                                return ErrorBuilder.FromError(er)
-                               .SetMessage(dbupdateexc.InnerException.Message)
-                               .SetCode("UNIQUE constraint failed")
-                               .RemoveException()
-                               .ClearExtensions()
-                               .ClearLocations()
-                               .Build();
+                                    if (dbupdateexc.InnerException.Message.IndexOf("UNIQUE constraint failed") > -1)
+                                        return ErrorBuilder.FromError(er)
+                                       .SetMessage(dbupdateexc.InnerException.Message)
+                                       .SetCode("UNIQUE constraint failed")
+                                       .RemoveException()
+                                       .ClearExtensions()
+                                       .ClearLocations()
+                                       .Build();
 
-                            break;
-                    }
-                    return er;
-                });
+                                    break;
+                            }
+                            return er;
+                        })
+            #endregion
+                ;
+            #endregion
+
         }
 
         #region Configure

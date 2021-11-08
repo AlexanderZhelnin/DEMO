@@ -9,34 +9,35 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using Microsoft.Extensions.Logging;
 
 namespace Demo.GraphQl
 {
-    //[ExtendObjectType(typeof(Query))]
-    //public class QueryExP
-    //{
-    //    public IEnumerable<int> GetInts() => new List<int> { 1, 5 };
-
-    //}
-
-    //public class ff
-    //{
-    //    public IQueryable<Author> Authors([Service] DemoContext ctx) => ctx.Authors;
-    //}
-
     /// <summary>
     /// Запросы GraphQl
     /// Главное отличик запроса в том что его подзапросы выполняются параллельно
     /// </summary>
     public class Query
     {
-        private static Dictionary<string, int[]> Permissions = new Dictionary<string, int[]>
-        {
-            { "admin", new int[] { 1 } },
-            { "Вася", new int[] { 2 } }
-        };
+        private ILogger<Query> _logger;
 
-        //public ff FF() => new ff();
+        //private static Dictionary<string, int[]> Permissions = new Dictionary<string, int[]>
+        //{
+        //    { "admin", new int[] { 1 } },
+        //    { "Вася", new int[] { 2 } }
+        //};
+
+        /// <summary>
+        /// Конструктор
+        /// </summary>
+        /// <param name="logger"></param>
+        public Query(ILogger<Query> logger)
+        {
+            _logger = logger;
+
+            logger.LogInformation("Инициализация");
+        }
+
 
         #region Authors
         /// <summary>
@@ -72,6 +73,7 @@ namespace Demo.GraphQl
                   ((IQueryable<Author>)ctx.Authors).Where(a => ids.Contains(a.Id));
         #endregion
 
+        #region AuthorById
         /// <summary>
         /// Получить автора по иникальному идентификатору
         /// </summary>
@@ -87,6 +89,7 @@ namespace Demo.GraphQl
 
             return author;
         }
+        #endregion
 
         #region Book           
         /// <summary>

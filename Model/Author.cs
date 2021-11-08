@@ -13,10 +13,10 @@ namespace Demo.Model
     /// </summary>
     public class Author
     {
-        public Author()
-        {
+        //public Author()
+        //{
 
-        }
+        //}
 
         /** Уникальный идентификатор */
         public int Id { get; set; }
@@ -31,7 +31,7 @@ namespace Demo.Model
         public ICollection<Book> Books { get; set; } = new List<Book>();
 
         /** Издательства */
-        public IEnumerable<Publisher> Publishers { get => PublishersAuthors.Select(s => s.Publisher); set { } }
+        public IList<Publisher> Publishers { get => PublishersAuthors.Select(s => s.Publisher).ToList(); set { } }
 
         /** Связь многие ко многим Издатели/Авторы */
         [Newtonsoft.Json.JsonIgnore]

@@ -13,6 +13,7 @@ namespace Demo.Model
         /// <param name="o">свойства контекста</param>
         public DemoContext(DbContextOptions o) : base(o)
         {
+#if SQLITE
             try
             {
                 Database.EnsureCreated();
@@ -21,6 +22,7 @@ namespace Demo.Model
             {
                 Debug.Print(e.ToString());
             }
+#endif
         }
 
         /** Авторы */
@@ -42,6 +44,8 @@ namespace Demo.Model
         /// </summary>        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.HasDefaultSchema("authors");
             #region Данные по умолчанию
             var authors = new Author[]
                   {

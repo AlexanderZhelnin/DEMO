@@ -31,8 +31,13 @@ namespace Demo.Controllers
         /// <summary>
         /// Конструктор
         /// </summary>
-        public AuthorsController(LongPollingQuery<Author> longpolling, DemoContext ctx, DemoRepository repository, IHttpClientFactory httpClientFactory)
-        {
+        public AuthorsController(
+            
+            LongPollingQuery<Author> longpolling,
+            DemoContext ctx, 
+            DemoRepository repository, 
+            IHttpClientFactory httpClientFactory)
+        {            
             _longpolling = longpolling;
             _ctx = ctx;
             _repository = repository;
