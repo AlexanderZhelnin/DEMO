@@ -31,7 +31,7 @@ namespace Demo.Model
         public ICollection<Book> Books { get; set; } = new List<Book>();
 
         /** Издательства */
-        public IList<Publisher> Publishers { get => PublishersAuthors.Select(s => s.Publisher).ToList(); set { } }
+        public List<Publisher> Publishers { get; set; } = new List<Publisher>();
 
         /** Связь многие ко многим Издатели/Авторы */
         [Newtonsoft.Json.JsonIgnore]

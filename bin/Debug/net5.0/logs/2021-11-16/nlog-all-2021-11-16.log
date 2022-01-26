@@ -1,0 +1,7 @@
+2021-11-16 09:12:58.6943|DEBUG|Demo.Program|Инициализация программы
+2021-11-16 09:13:01.2436|INFO|Microsoft.Hosting.Lifetime|Now listening on: https://localhost:5005
+2021-11-16 09:13:01.2649|INFO|Microsoft.Hosting.Lifetime|Now listening on: http://localhost:5004
+2021-11-16 09:13:01.2711|INFO|Microsoft.Hosting.Lifetime|Application started. Press Ctrl+C to shut down.
+2021-11-16 09:13:01.2711|INFO|Microsoft.Hosting.Lifetime|Hosting environment: Development
+2021-11-16 09:13:01.2836|INFO|Microsoft.Hosting.Lifetime|Content root path: C:\Project\DEMO
+2021-11-16 09:13:07.0026|INFO|Demo.GraphQl.Query|{ "name":"sefsargf"}

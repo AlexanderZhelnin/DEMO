@@ -206,5 +206,15 @@ namespace Demo.Controllers
             //_ctx.SaveChanges();
         }
 
+        /// <summary>
+        /// Тестовая функция с получением данных из "другого" микросервиса, с авторизацией
+        /// </summary>        
+        [HttpGet("TestDate", Name = nameof(TestDate))]
+        public DateTime TestDate(DateTime dt)
+        {
+          return dt;
+        }
+
+
     }
 }

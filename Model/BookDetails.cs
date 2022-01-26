@@ -25,7 +25,7 @@ namespace Demo.Model
     {
         /** Фантастика */
         fantastic,
-        /** Фентази */
+        /** Фантази */
         fantasy,
         /** litRPG */
         litrpg,

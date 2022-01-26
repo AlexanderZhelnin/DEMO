@@ -24,7 +24,8 @@ namespace Demo.Model
         /** Уникльный идентификатор автора */
         public int AuthorId { get; set; }
         /** Автор */
-        //[JsonIgnore]
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         public Author Author { get; set; }
 
         /** Идентификатор ISBN10 */
@@ -33,7 +34,7 @@ namespace Demo.Model
         public string ISBN_13 { get; set; }
 
         /** Дополнительная информация по книге */
-        public BookDetails Detatils { get; set; }
+        public BookDetails Details { get; set; }
 
     }
 }

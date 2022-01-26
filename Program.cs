@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NLog.Web;
 
+
 namespace Demo
 {
     /** */
@@ -16,23 +17,25 @@ namespace Demo
         /** */
         public static void Main(string[] args)
         {
-
             var logger = NLogBuilder
                 .ConfigureNLog("nlog.config")
                 .GetCurrentClassLogger();
             try
             {
-                logger.Debug("Инициализация программы");
-                #region Инициализация программы
-                var host = CreateHostBuilder(args).Build();
 
+                #region Инициализация программы
+                logger.Debug("Инициализация программы");
+                var host = CreateHostBuilder(args).Build();
 #if !SQLITE
-                using (var scope = host.Services.CreateScope())
-                {
-                    var db = scope.ServiceProvider.GetRequiredService<DemoContext>();
-                    db.Database.Migrate();
-                }
-#endif 
+                using var scope = host.Services.CreateScope();
+
+                scope
+                    .ServiceProvider
+                    .GetRequiredService<DemoContext>()
+                    .Database
+                    .Migrate();
+
+#endif
                 #endregion
 
                 host.Run();

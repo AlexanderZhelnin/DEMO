@@ -32,6 +32,10 @@ using System.Security.Claims;
 using System.Net.Http;
 using Demo.HttpHandler;
 using HotChocolate;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Globalization;
+using HotChocolate.Types.Pagination;
+using HotChocolate.Data.Filters;
 
 namespace Demo
 {
@@ -54,6 +58,121 @@ namespace Demo
     }
     #endregion
 
+    //public class AuthorFilterType : FilterInputType<Author>
+    //{
+    //    protected override void Configure(
+    //        IFilterInputTypeDescriptor<Author> descriptor)
+    //    {
+    //        descriptor.BindFieldsExplicitly();
+    //        descriptor.Field(f => f.Name).Type<AuthorOperationFilterInput>();
+    //    }
+    //}
+
+    //public class AuthorOperationFilterInput : StringOperationFilterInputType
+    //{
+    //    protected override void Configure(IFilterInputTypeDescriptor descriptor)
+    //    {
+    //        descriptor.Operation(DefaultFilterOperations.Equals);
+    //        //descriptor.Operation(DefaultFilterOperations.NotEquals);
+    //    }
+    //}
+    public class DateTimeModelBinderProvider : IModelBinderProvider
+    {
+        // You could make this a property to allow customization
+        internal static readonly DateTimeStyles SupportedStyles = DateTimeStyles.AdjustToUniversal | DateTimeStyles.AllowWhiteSpaces;
+
+        /// <inheritdoc />
+        public IModelBinder GetBinder(ModelBinderProviderContext context)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            var modelType = context.Metadata.UnderlyingOrModelType;
+            var loggerFactory = context.Services.GetRequiredService<ILoggerFactory>();
+            if (modelType == typeof(DateTime))
+            {
+                return new UtcAwareDateTimeModelBinder(SupportedStyles, loggerFactory);
+            }
+
+            return null;
+        }
+    }
+    public class UtcAwareDateTimeModelBinder : IModelBinder
+    {
+        private readonly DateTimeStyles _supportedStyles;
+        private readonly ILogger _logger;
+
+        public UtcAwareDateTimeModelBinder(DateTimeStyles supportedStyles, ILoggerFactory loggerFactory)
+        {
+            if (loggerFactory == null)
+            {
+                throw new ArgumentNullException(nameof(loggerFactory));
+            }
+
+            _supportedStyles = supportedStyles;
+            _logger = loggerFactory.CreateLogger<UtcAwareDateTimeModelBinder>();
+        }
+
+        public Task BindModelAsync(ModelBindingContext bindingContext)
+        {
+            if (bindingContext == null)
+            {
+                throw new ArgumentNullException(nameof(bindingContext));
+            }
+
+            var modelName = bindingContext.ModelName;
+            var valueProviderResult = bindingContext.ValueProvider.GetValue(modelName);
+            if (valueProviderResult == ValueProviderResult.None)
+            {
+                // no entry
+                return Task.CompletedTask;
+            }
+
+            var modelState = bindingContext.ModelState;
+            modelState.SetModelValue(modelName, valueProviderResult);
+
+            var metadata = bindingContext.ModelMetadata;
+            var type = metadata.UnderlyingOrModelType;
+
+            var value = valueProviderResult.FirstValue;
+            var culture = valueProviderResult.Culture;
+
+            object model;
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                model = null;
+            }
+            else if (type == typeof(DateTime))
+            {
+                // You could put custom logic here to sniff the raw value and call other DateTime.Parse overloads, e.g. forcing UTC
+                model = DateTime.Parse(value, culture, _supportedStyles);
+            }
+            else
+            {
+                // unreachable
+                throw new NotSupportedException();
+            }
+
+            // When converting value, a null model may indicate a failed conversion for an otherwise required
+            // model (can't set a ValueType to null). This detects if a null model value is acceptable given the
+            // current bindingContext. If not, an error is logged.
+            if (model == null && !metadata.IsReferenceOrNullableType)
+            {
+                modelState.TryAddModelError(
+                    modelName,
+                    metadata.ModelBindingMessageProvider.ValueMustNotBeNullAccessor(
+                        valueProviderResult.ToString()));
+            }
+            else
+            {
+                bindingContext.Result = ModelBindingResult.Success(model);
+            }
+
+            return Task.CompletedTask;
+        }
+    }
 
     /** **/
     [ExcludeFromCodeCoverage]
@@ -109,10 +228,11 @@ namespace Demo
                         {
                             ClockSkew = TimeSpan.FromSeconds(5),
                             ValidateAudience = false
-                        };
-
+                        };                        
                         config.RequireHttpsMetadata = false;
+                        // Сервер OAUTH 2.0 
                         config.Authority = "http://localhost:8080/auth/realms/SAT/";
+                        // Проверка для проекта
                         config.Audience = "DEMO";
                     });
             #endregion
@@ -127,6 +247,7 @@ namespace Demo
             services
                     .AddControllers(o =>
                     {
+                        o.ModelBinderProviders.Insert(0, new DateTimeModelBinderProvider());
                         //Региструрем обработчик для фильтрации ошибок
                         o.Filters.Add(typeof(ExceptionFilter));
                     })
@@ -137,7 +258,8 @@ namespace Demo
                         o.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 
                         //o.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
-                    });
+                    })
+                    ;
             //.AddJsonOptions(o =>
             //{
             //    o.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
@@ -149,9 +271,9 @@ namespace Demo
                     {
                         c.SwaggerDoc("v1", new OpenApiInfo
                         {
-                            Title = "Демонстрационное приложение для REST API",
+                            Title = "Демонстрационное приложение",
                             Version = "v1",
-                            Description = "REST, CORS, LongPolling, Routing, ...",
+                            Description = "REST, CORS, LongPolling, Routing, GraphQL, NLog ...",
                             Contact = new OpenApiContact
                             {
                                 Name = "Александр Желнин"
@@ -191,7 +313,7 @@ namespace Demo
             services.AddPooledDbContextFactory<DemoContext>(ob =>
                 {
 #if SQLITE
-                var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = System.IO.Path.Combine(AppContext.BaseDirectory, "gc.db") }.ToString());
+                    var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = System.IO.Path.Combine(AppContext.BaseDirectory, "db.db") }.ToString());
 #else
                     var connection = new Npgsql.NpgsqlConnection(Configuration.GetConnectionString("DefaultConnection"));
 #endif
@@ -271,11 +393,19 @@ namespace Demo
                 .AddFiltering()
                 //добавляем возможность сортировки
                 .AddSorting()
+                .SetPagingOptions(new PagingOptions
+                {
+                    MaxPageSize = 500,
+                    DefaultPageSize = 100,
+                    
+                    //AllowBackwardPagination = false
+                })
+                
                 //Добавляем функцию автоматических сохранённых запросов
                 .UseAutomaticPersistedQueryPipeline()
                 //Хранилище сохранённых запросов в оперативной памяти
                 .AddInMemoryQueryStorage()
-            #region Обработка ошибок
+                #region Обработка ошибок
                 .AddErrorFilter(er =>
                         {
                             switch (er.Exception)

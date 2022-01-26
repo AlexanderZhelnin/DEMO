@@ -12,7 +12,7 @@ namespace Demo.GraphQl
     /// Главное отличие в том что подзапросы выполняются последовательно, в том же порядке что указано в запросе
     /// </summary>
     public class Mutation
-    {       
+    {
         #region Create
         /// <summary>
         /// Создание автора
@@ -43,9 +43,27 @@ namespace Demo.GraphQl
         }
         #endregion
 
+        #region Delete
+        /// <summary>
+        /// Удаление автора
+        /// </summary>
+        /// <param name="id">Уникальный идентификатор автора</param>        
+        /// <param name="ctx">Контекст базы данных Entity</param>
+        /// <returns>Автор</returns>        
+        public Author Delete(int id, [Service] DemoContext ctx)
+        {
+            var author = ctx.Authors.FirstOrDefault(a => a.Id == id);
+            if (author == null)
+                throw new ArgumentException("Автор не найден");
+            ctx.Remove(author);
+            ctx.SaveChanges();
+            return author;
+        }
+        #endregion
+
         #region CreateOrUpdate
         /// <summary>
-        /// Создать или обновить автора тут логика такая, если Id равер 0, то это однозначно новый автор
+        /// Создать или обновить автора тут логика такая, если Id равен 0, то это однозначно новый автор
         /// </summary>
         /// <param name="ctx">Контекст базы данных Entity</param>
         /// <param name="author">Создать или обновить автора</param>
@@ -60,6 +78,7 @@ namespace Demo.GraphQl
 
             ctx.SaveChanges();
 
+            // по инициативе сервера отправляем клиентам данные
             await sender.SendAsync(nameof(Subscription.OnAuthorChanged), author);
             return author;
         }
@@ -72,6 +91,16 @@ namespace Demo.GraphQl
         public Author ThrowError()
         {
             throw new Exception("Специально сгенерированная ошибка");
+        }
+
+        /// <summary>
+        /// Проверка даты
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        public DateTime TestDateTime(DateTime dt)
+        {
+            return dt;
         }
 
     }

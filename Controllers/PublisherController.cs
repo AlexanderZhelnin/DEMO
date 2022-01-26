@@ -14,7 +14,6 @@ namespace Demo.Controllers
     /// <summary>
     /// Контроллер издателей
     /// </summary>
-
     [Route("api/[controller]")]
     [ApiController]
     public class PublisherController : ControllerBase

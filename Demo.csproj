@@ -1,44 +1,44 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>C:\Users\Kulibin\source\repos\WebApplication7\WebApplication7\Demo.xml</DocumentationFile>
-    <DefineConstants>$(DefineConstants)TRACE SQLITE</DefineConstants>
+    <DefineConstants>$(DefineConstants)TRACE SQLITE1</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>$(DefineConstants)TRACE SQLITE</DefineConstants>
+    <DefineConstants>$(DefineConstants)TRACE SQLITE1</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EFCore.NamingConventions" Version="5.0.2" />
-    <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="5.0.0" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="12.0.1" />
-    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="12.0.1" />
-    <PackageReference Include="HotChocolate.Data" Version="12.0.1" />
-    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="12.0.1" />
-    <PackageReference Include="HotChocolate.PersistedQueries.InMemory" Version="12.0.1" />
-    <PackageReference Include="HotChocolate.Stitching" Version="12.0.1" />
-    <PackageReference Include="HotChocolate.Subscriptions.InMemory" Version="12.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.11" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.11" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.11" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.11" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.11" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="5.0.11" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.11">
+    <PackageReference Include="EFCore.NamingConventions" Version="6.0.0" />
+    <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="6.0.1" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="12.5.0" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="12.5.0" />
+    <PackageReference Include="HotChocolate.Data" Version="12.5.0" />
+    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="12.5.0" />
+    <PackageReference Include="HotChocolate.PersistedQueries.InMemory" Version="12.5.0" />
+    <PackageReference Include="HotChocolate.Stitching" Version="12.5.0" />
+    <PackageReference Include="HotChocolate.Subscriptions.InMemory" Version="12.5.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="6.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.14.0" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.10" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.2" />    
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.13.1" />
-    <PackageReference Include="System.Linq.Async" Version="5.0.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />    
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.15.1" />
+    <PackageReference Include="System.Linq.Async" Version="5.1.0" />
     <PackageReference Include="System.Reactive" Version="5.0.0" />
   </ItemGroup>
 

@@ -18,6 +18,8 @@ namespace Demo.Model
         public string Name { get; set; }
 
         /** Авторы */
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         public ICollection<Author> Authors { get; set; } = new List<Author>();
 
         /** Связь многие ко многим Издатели/Авторы */

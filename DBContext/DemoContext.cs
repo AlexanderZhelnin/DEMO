@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Demo.Model
 {
@@ -44,14 +45,16 @@ namespace Demo.Model
         /// </summary>        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
+            //modelBuilder.UseCollation("SQL_Latin1_General_CP1_CS_AS");
             modelBuilder.HasDefaultSchema("authors");
             #region Данные по умолчанию
-            var authors = new Author[]
-                  {
-                    new() { Id = 1, Name = "Вася", },
-                    new() { Id = 2, Name = "Петя", }
-                  };
+            //var authors = new Author[]
+            //      {
+            //        new() { Id = 1, Name = "Вася", },
+            //        new() { Id = 2, Name = "Петя", }
+            //      };
+
+            var authors = Enumerable.Range(1, 500).Select(i => new Author { Id = i, Name = "Автор " + i });
             var publishers = new Publisher[]
                {
                     new() { Id = 1, Name = "Издательство ООО \"Сервер\"" },
@@ -64,6 +67,10 @@ namespace Demo.Model
                 //b.Property(a => a.Id).ValueGeneratedNever();
                 b.HasKey(a => a.Id);
                 b.HasIndex(b => b.Name).IsUnique();
+
+                //b.Property(c => c.Name)
+                //    .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+
                 #region Данные по умолчанию
                 b.HasData(authors);
                 #endregion
@@ -123,7 +130,7 @@ namespace Demo.Model
                                Description = "Научная фантастика и приключение героя в далёком космосе",
 
                            });
-                #endregion
+                #endregion                                
             });
 
             modelBuilder.Entity<BookDetails>(b =>

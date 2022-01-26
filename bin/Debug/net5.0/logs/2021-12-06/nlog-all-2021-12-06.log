@@ -1,0 +1,267 @@
+2021-12-06 16:05:42.5330|DEBUG|Demo.Program|Инициализация программы
+2021-12-06 16:05:46.7187|WARN|Microsoft.EntityFrameworkCore.Model.Validation|Sensitive data logging is enabled. Log entries and exception messages may include sensitive application data; this mode should only be enabled during development.
+2021-12-06 16:05:47.0729|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (15ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace WHERE c.relname='__EFMigrationsHistory');
+2021-12-06 16:05:47.1322|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace WHERE c.relname='__EFMigrationsHistory');
+2021-12-06 16:05:47.1533|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT migration_id, product_version
+FROM "__EFMigrationsHistory"
+ORDER BY migration_id;
+2021-12-06 16:05:47.7335|INFO|Microsoft.Hosting.Lifetime|Now listening on: https://localhost:5005
+2021-12-06 16:05:47.7633|INFO|Microsoft.Hosting.Lifetime|Now listening on: http://localhost:5004
+2021-12-06 16:05:47.7633|INFO|Microsoft.Hosting.Lifetime|Application started. Press Ctrl+C to shut down.
+2021-12-06 16:05:47.7633|INFO|Microsoft.Hosting.Lifetime|Hosting environment: Development
+2021-12-06 16:05:47.7858|INFO|Microsoft.Hosting.Lifetime|Content root path: C:\Project\DEMO
+2021-12-06 16:05:51.5544|INFO|Demo.GraphQl.Query|Инициализация
+2021-12-06 16:09:42.0351|WARN|Microsoft.EntityFrameworkCore.Query|Compiling a query which loads related collections for more than one collection navigation either via 'Include' or through projection but no 'QuerySplittingBehavior' has been configured. By default Entity Framework will use 'QuerySplittingBehavior.SingleQuery' which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'
+2021-12-06 16:09:42.1938|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (26ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 16:57:46.1629|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (10ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 16:58:26.2120|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 16:59:03.4621|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 16:59:11.4007|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (13ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 17:00:17.0765|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 17:01:55.7657|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 17:02:33.2899|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 17:03:39.4423|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 17:04:07.8354|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 17:04:27.2582|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 17:04:31.4839|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 17:04:54.1909|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 17:05:28.4999|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 17:06:02.3072|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 17:06:22.7125|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 17:06:54.0228|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 17:08:06.0495|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 17:08:22.0612|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 17:09:36.0184|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 17:21:55.5714|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 17:22:21.1328|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 17:23:17.7144|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 17:23:40.4720|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
+2021-12-06 17:30:23.4013|INFO|Microsoft.EntityFrameworkCore.Database.Command|Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT a.id, a.name, b.id, b.author_id, b.description, b.isbn_10, b.isbn_13, b.image_url, b.title, t.author_id, t.publisher_id, t.id, t.name
+FROM authors.authors AS a
+LEFT JOIN authors.books AS b ON a.id = b.author_id
+LEFT JOIN (
+    SELECT p.author_id, p.publisher_id, p0.id, p0.name
+    FROM authors.publishers_authors AS p
+    INNER JOIN authors.publishers AS p0 ON p.publisher_id = p0.id
+) AS t ON a.id = t.author_id
+ORDER BY a.id, b.id, t.author_id, t.publisher_id, t.id
