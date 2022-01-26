@@ -1,6 +1,0 @@
-2021-11-14 16:54:07.9003|DEBUG|Demo.Program|Инициализация программы
-2021-11-14 16:54:10.5959|INFO|Microsoft.Hosting.Lifetime|Now listening on: https://localhost:5005
-2021-11-14 16:54:10.6401|INFO|Microsoft.Hosting.Lifetime|Now listening on: http://localhost:5004
-2021-11-14 16:54:10.6449|INFO|Microsoft.Hosting.Lifetime|Application started. Press Ctrl+C to shut down.
-2021-11-14 16:54:10.6575|INFO|Microsoft.Hosting.Lifetime|Hosting environment: Development
-2021-11-14 16:54:10.6575|INFO|Microsoft.Hosting.Lifetime|Content root path: C:\Project\DEMO
