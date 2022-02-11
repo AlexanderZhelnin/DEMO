@@ -8,53 +8,52 @@ using Microsoft.Extensions.Hosting;
 using NLog.Web;
 
 
-namespace Demo
+namespace Demo;
+
+/** */
+[ExcludeFromCodeCoverage]
+public class Program
 {
     /** */
-    [ExcludeFromCodeCoverage]
-    public class Program
+    public static void Main(string[] args)
     {
-        /** */
-        public static void Main(string[] args)
+        var logger = NLogBuilder
+            .ConfigureNLog("nlog.config")
+            .GetCurrentClassLogger();
+        try
         {
-            var logger = NLogBuilder
-                .ConfigureNLog("nlog.config")
-                .GetCurrentClassLogger();
-            try
-            {
 
-                #region Инициализация программы
-                logger.Debug("Инициализация программы");
-                var host = CreateHostBuilder(args).Build();
+            #region Инициализация программы
+            logger.Debug("Инициализация программы");
+            var host = CreateHostBuilder(args).Build();
 #if !SQLITE
-                using var scope = host.Services.CreateScope();
+            using var scope = host.Services.CreateScope();
 
-                scope
-                    .ServiceProvider
-                    .GetRequiredService<DemoContext>()
-                    .Database
-                    .Migrate();
+            scope
+                .ServiceProvider
+                .GetRequiredService<DemoContext>()
+                .Database
+                .Migrate();
 
 #endif
-                #endregion
+            #endregion
 
-                host.Run();
-            }
-            catch (Exception exception)
-            {
-                logger.Error(exception, "Закрытие программы");
-                throw;
-            }
-            finally
-            {
-                NLog.LogManager.Shutdown();
-            }
+            host.Run();
         }
-
-        /** */
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
-                .UseNLog();
+        catch (Exception exception)
+        {
+            logger.Error(exception, "Закрытие программы");
+            throw;
+        }
+        finally
+        {
+            NLog.LogManager.Shutdown();
+        }
     }
+
+    /** */
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
+            .UseNLog();
 }
