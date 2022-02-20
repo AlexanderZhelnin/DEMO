@@ -23,6 +23,12 @@ using HotChocolate;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Globalization;
 using HotChocolate.Types.Pagination;
+using Demo.Health;
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 namespace Demo;
 
@@ -161,12 +167,29 @@ public class UtcAwareDateTimeModelBinder : IModelBinder
     }
 }
 
+
+
 /** **/
 [ExcludeFromCodeCoverage]
 public class Startup
 {
-    /** конфигурация **/
+    /** Конфигурация **/
     public IConfiguration Configuration { get; }
+
+    /** Функция записи результата проверки работоспособности */
+    private static Task WriteHealthCheckResponse(HttpContext httpContext, HealthReport result)
+    {
+        httpContext.Response.ContentType = "application/json";
+        var json = new JObject(
+        new JProperty("status", result.Status.ToString()),
+        new JProperty("results", new JObject(result.Entries.Select(pair =>
+        new JProperty(pair.Key, new JObject(
+        new JProperty("status", pair.Value.Status.ToString()),
+        new JProperty("description", pair.Value.Description),
+        new JProperty("data", new JObject(pair.Value.Data.Select(
+        p => new JProperty(p.Key, p.Value))))))))));
+        return httpContext.Response.WriteAsync(json.ToString(Formatting.Indented));
+    }
 
     #region Конструктор
     /** **/
@@ -215,7 +238,7 @@ public class Startup
                     {
                         ClockSkew = TimeSpan.FromSeconds(5),
                         ValidateAudience = false
-                    };                        
+                    };
                     config.RequireHttpsMetadata = false;
                     // Сервер OAUTH 2.0 
                     config.Authority = "http://localhost:8080/auth/realms/SAT/";
@@ -384,15 +407,15 @@ public class Startup
             {
                 MaxPageSize = 500,
                 DefaultPageSize = 100,
-                
+
                 //AllowBackwardPagination = false
             })
-            
+
             //Добавляем функцию автоматических сохранённых запросов
             .UseAutomaticPersistedQueryPipeline()
             //Хранилище сохранённых запросов в оперативной памяти
             .AddInMemoryQueryStorage()
-            #region Обработка ошибок
+        #region Обработка ошибок
             .AddErrorFilter(er =>
                     {
                         switch (er.Exception)
@@ -424,10 +447,14 @@ public class Startup
             ;
         #endregion
 
+        #region Регистрируем фоновые задачи
+        //services.AddHostedService<BookAVG>();
+        //services.AddHostedService<TCPServer>(); 
+        #endregion
 
-        services.AddHostedService<BookAVG>();
-        services.AddHostedService<TCPServer>();
-        
+        services.AddHealthChecks()
+            .AddCheck<CustumHealthCheck>("API")
+            .AddNpgSql(Configuration.GetConnectionString("DefaultConnection"));
     }
 
     #region Configure
@@ -447,7 +474,6 @@ public class Startup
 
         app.UseWebSockets();
 
-
         app.UseAuthentication();
         app.UseAuthorization();
 
@@ -458,6 +484,8 @@ public class Startup
             endpoints.MapControllers();
             endpoints.MapGraphQL("/graphql");
         });
+
+        app.UseHealthChecks("/health", new HealthCheckOptions { ResponseWriter = WriteHealthCheckResponse });
     }
     #endregion
 }
