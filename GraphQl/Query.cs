@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using HotChocolate.Types.Pagination;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Demo.GraphQl;
 
@@ -23,6 +24,8 @@ namespace Demo.GraphQl;
 public class Query
 {
     private ILogger<Query> _logger;
+    private readonly IConfiguration _configuration;
+    //private readonly IOptionsMonitor<Settings> _settings;
 
     //private static Dictionary<string, int[]> Permissions = new Dictionary<string, int[]>
     //{
@@ -33,11 +36,12 @@ public class Query
     /// <summary>
     /// Конструктор
     /// </summary>
-    public Query(ILogger<Query> logger)
+    public Query(ILogger<Query> logger, IConfiguration configuration)//, IOptionsMonitor<Settings> settings)
     {
-        _logger = logger;
+        (_logger, _configuration) = (logger, configuration);
 
         logger.LogInformation("Инициализация");
+        //_settings = settings;
     }
 
     /// <summary>
@@ -178,7 +182,7 @@ public class Query
     public IQueryable<Book> Books([Service] DemoContext ctx) => ctx.Books;
     #endregion
 
-    #region AuthorizeQuer           
+    #region AuthorizeQuery           
     /// <summary>
     /// Тестовая функция с авторизацией
     /// </summary>
@@ -193,6 +197,62 @@ public class Query
 
     }
     #endregion
+
+
+    /** Проверяем конфигурацию на прямую */
+    public string TestConfigurationDirectly()
+    {
+        return _configuration["key1"];
+    }
+
+    /** Проверяем конфигурацию из JSON */
+    public string TestConfigurationJSON()
+    {
+        return _configuration["settings:JSONKey1"];
+    }
+
+    /** Проверяем работу значений из YAML файла */
+    public string TestConfigurationYaml()
+    {
+        return _configuration["yamlkey3:v1"];
+    }
+
+    /** Проверяем конфигурацию из xml */
+    public string TestConfigurationXML()
+    {
+        return _configuration["XMLKey1"];
+    }
+
+    /** Проверяем простейшие опции */
+    public string TestOptions([Service] IOptions<OAUTHSettings> settings)
+    {
+        return settings.Value.OAUTH_PATH;
+    }
+
+    /** Проверяем простейшие опции снимка */
+    public string TestOptionsSnapshot([Service] IOptionsSnapshot<OAUTHSettings> settings)
+    {
+        return settings.Value.OAUTH_PATH;
+    }
+
+    /**  Проверяем работу опций типа монитор */
+    public string TestOptionsMonitor([Service] IOptionsMonitor<OAUTHSettings> settings)
+    {
+        return settings.CurrentValue.OAUTH_PATH;
+    }
+
+    /** Проверяем работу динамических значений */
+    public string TestConfigurationDynamic()
+    {
+        return _configuration["DynamicKey1"];
+    }
+
+    /** Проверяем работу значений из базы данных */
+    public string TestConfigurationDB()
+    {
+        return _configuration["DBConfiguration:DBKey1"];
+    }
+
 
 }
 

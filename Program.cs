@@ -1,5 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using Demo.Configurations.DB;
+using Demo.Configurations.Dynamic;
 using Demo.Model;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +19,7 @@ public class Program
     /** */
     public static void Main(string[] args)
     {
+
         var logger = NLogBuilder
             .ConfigureNLog("nlog.config")
             .GetCurrentClassLogger();
@@ -27,13 +30,13 @@ public class Program
             logger.Debug("Инициализация программы");
             var host = CreateHostBuilder(args).Build();
 #if !SQLITE
-            using var scope = host.Services.CreateScope();
+                    using var scope = host.Services.CreateScope();
 
-            scope
-                .ServiceProvider
-                .GetRequiredService<DemoContext>()
-                .Database
-                .Migrate();
+                    scope
+                        .ServiceProvider
+                        .GetRequiredService<DemoContext>()
+                        .Database
+                        .Migrate();
 
 #endif
             #endregion
@@ -49,11 +52,30 @@ public class Program
         {
             NLog.LogManager.Shutdown();
         }
+
     }
 
     /** */
     public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
+            // Настраиваем конфигурацию
+            .ConfigureAppConfiguration((appConfiguration) =>
+            {                
+                // пример подключения json
+                appConfiguration.AddJsonFile("settings.json", false, true);
+
+                // пример подключения yaml конфигурации
+                appConfiguration.AddYamlFile("settings.yml", false, true);
+
+                // пример подключение xml конфигурации
+                appConfiguration.AddXmlFile("settings.xml", false, true);
+
+                // Добавляем конфигурации из базы данных
+                appConfiguration.AddDB();
+
+                // пример добавление пользовательского источника конфигурации
+                appConfiguration.Add(new DynamicValueConfigurationSource());
+            })
             .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
             .UseNLog();
 }

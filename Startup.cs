@@ -29,6 +29,9 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Hosting.Internal;
 
 namespace Demo;
 
@@ -167,6 +170,32 @@ public class UtcAwareDateTimeModelBinder : IModelBinder
     }
 }
 
+#region SettingsWatchdog
+/** Отслеживание изменения конфигурации */
+public class SettingsWatchdog
+{
+    private readonly IOptionsMonitor<OAUTHSettings> _settings;
+
+
+    public SettingsWatchdog(IOptionsMonitor<OAUTHSettings> settings)
+    {
+        _settings = settings;
+        _settings.OnChange((s) =>
+        {
+            Console.WriteLine("Напрмер перезагружаем микросервис");
+        });
+    }
+}
+#endregion
+
+
+#region OAUTHSettings
+public class OAUTHSettings
+{
+    public string OAUTH_PATH { get; set; }
+    public string OAUTH_CLIENT_ID { get; set; }
+}
+#endregion
 
 
 /** **/
@@ -176,6 +205,7 @@ public class Startup
     /** Конфигурация **/
     public IConfiguration Configuration { get; }
 
+    #region WriteHealthCheckResponse
     /** Функция записи результата проверки работоспособности */
     private static Task WriteHealthCheckResponse(HttpContext httpContext, HealthReport result)
     {
@@ -190,6 +220,7 @@ public class Startup
         p => new JProperty(p.Key, p.Value))))))))));
         return httpContext.Response.WriteAsync(json.ToString(Formatting.Indented));
     }
+    #endregion
 
     #region Конструктор
     /** **/
@@ -203,6 +234,13 @@ public class Startup
     /** Конфигурация сервисов **/
     public void ConfigureServices(IServiceCollection services)
     {
+        services.Configure<OAUTHSettings>(Configuration.GetSection("Authentication"));
+
+        //services.AddSingleton<AppSettingsWrapper>();
+        //(sp =>
+        //{
+        //    return new AppSettingsWrapper(sp.GetService<IOptionsMonitor<Settings>>());
+        //});
 
         #region Добавляем логирование
         services.AddLogging(loggingBuilder =>
@@ -220,6 +258,8 @@ public class Startup
         #endregion
 
         #region Регистрируем сервисы
+        //Отслеживание изменения конфигурации
+        services.AddSingleton<SettingsWatchdog>();
         //Добавляем в DI конвеер контекст базы данных, в режиме singleton
         services.AddSingleton<LongPollingQuery<Author>>();
         //Добавляем в DI конвеер контекст базы данных, в режиме новый для каждого запроса
@@ -228,12 +268,17 @@ public class Startup
         services.AddTransient<DemoRepository>();
         //Добавляем в DI конвеер обрабочик запроса, в режиме новый для каждого запроса
         services.AddTransient<HttpTrackerHandler>();
+
         #endregion
 
         #region Добавляем конфигурацию авторизации
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, config =>
                 {
+                    var aoptions = Configuration
+                        .GetSection("Authentication")
+                        .Get<OAUTHSettings>();
+
                     config.TokenValidationParameters = new TokenValidationParameters
                     {
                         ClockSkew = TimeSpan.FromSeconds(5),
@@ -241,9 +286,9 @@ public class Startup
                     };
                     config.RequireHttpsMetadata = false;
                     // Сервер OAUTH 2.0 
-                    config.Authority = "http://localhost:8080/auth/realms/SAT/";
+                    config.Authority = Configuration["Authentication:OAUTH_PATH"];
                     // Проверка для проекта
-                    config.Audience = "DEMO";
+                    config.Audience = Configuration["Authentication:OAUTH_CLIENT_ID"];
                 });
         #endregion
 
@@ -287,7 +332,6 @@ public class Startup
                         Contact = new OpenApiContact
                         {
                             Name = "Александр Желнин"
-
                         }
                         //, License =
                         //, TermsOfService = 
@@ -305,8 +349,8 @@ public class Startup
                 options.AddPolicy("MyPolicy", builder =>
                 {
                     builder
-                        //.AllowAnyOrigin()
-                        .WithOrigins("http://localhost:4200")
+                        .AllowAnyOrigin()
+                        //.WithOrigins("http://localhost:4200")
                         .AllowAnyHeader()
                         .AllowAnyMethod();
                 });
@@ -459,7 +503,7 @@ public class Startup
 
     #region Configure
     /** Конфигурация midlware **/
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SettingsWatchdog swd)
     {
         if (env.IsDevelopment())
         {
@@ -481,6 +525,7 @@ public class Startup
 
         app.UseEndpoints(endpoints =>
         {
+            endpoints.MapGet("/", () => "Демонстарционный пример Александр Желнин");
             endpoints.MapControllers();
             endpoints.MapGraphQL("/graphql");
         });
