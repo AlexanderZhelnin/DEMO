@@ -1,4 +1,4 @@
-﻿using Demo.Model;
+﻿using Demo.Models;
 using HotChocolate;
 using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Data;
@@ -14,6 +14,7 @@ using HotChocolate.Types.Pagination;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Demo.DB;
 
 namespace Demo.GraphQl;
 
@@ -21,9 +22,12 @@ namespace Demo.GraphQl;
 /// Запросы GraphQl
 /// Главное отличик запроса в том что его подзапросы выполняются параллельно
 /// </summary>
-public class Query
+public partial class Query
 {
-    private ILogger<Query> _logger;
+    [LoggerMessage(0, LogLevel.Information, "Чтение {Author}")]
+    partial void LogRead(Author author);
+
+    private readonly ILogger<Query> _logger;
     private readonly IConfiguration _configuration;
     //private readonly IOptionsMonitor<Settings> _settings;
 
@@ -132,7 +136,7 @@ public class Query
         //    if (Permissions.TryGetValue(r.Value, out var ids)) accessIds.AddRange(ids);
         //return ((IQueryable<Author>)ctx.Authors).Where(a => accessIds.Contains(a.Id)); 
         #endregion
-
+        
         //var resutl = ((IQueryable<Author>)ctx.Authors).Where(a => EF.Functions.ILike(a.Name, "автор 4")).ToList();
         var resutl = ((IQueryable<Author>)ctx.Authors.AsNoTracking()).Where(a => a.Name.ToLower() == "автор 4".ToLower()).ToList();
 
@@ -253,6 +257,16 @@ public class Query
         return _configuration["DBConfiguration:DBKey1"];
     }
 
+    public int[] Test1()
+    {
+        return new int[] { 1, 2, 3 };
+    }
+
+
+    public string Test2(int[] ids)
+    {
+        return string.Join(',', ids);
+    }
 
 }
 

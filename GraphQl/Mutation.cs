@@ -1,4 +1,5 @@
-﻿using Demo.Model;
+﻿using Demo.DB;
+using Demo.Models;
 using HotChocolate;
 using HotChocolate.Subscriptions;
 using System;
@@ -84,6 +85,7 @@ public class Mutation
     }
     #endregion
 
+    #region ThrowError
     /// <summary>
     /// Генерация ошибки для проверки транзакции
     /// </summary>      
@@ -92,7 +94,9 @@ public class Mutation
     {
         throw new Exception("Специально сгенерированная ошибка");
     }
+    #endregion
 
+    #region TestDateTime
     /// <summary>
     /// Проверка даты
     /// </summary>
@@ -101,6 +105,18 @@ public class Mutation
     public DateTime TestDateTime(DateTime dt)
     {
         return dt;
+    } 
+    #endregion
+
+    public int[] Test1()
+    {
+        return new int[] { 1, 2, 3 };
+    }
+
+
+    public string Test2(int[] ids)
+    {        
+        return string.Join(',', ids);
     }
 
 }

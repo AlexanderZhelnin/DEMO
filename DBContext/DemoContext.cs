@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Demo.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Diagnostics;
 using System.Linq;
 
-namespace Demo.Model;
+namespace Demo.DB;
 
 /** */
 public class DemoContext : DbContext

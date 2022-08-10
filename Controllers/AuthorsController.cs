@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Demo.Model;
+using Demo.Models;
 using Microsoft.AspNetCore.Http;
 using System.Net.Http;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Demo.DB;
+using Mapster;
 
 namespace Demo.Controllers;
 
@@ -16,7 +18,7 @@ namespace Demo.Controllers;
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
-public class AuthorsController : ControllerBase
+public partial class AuthorsController : ControllerBase
 {
     #region Переменные
     internal static int _id = 20;
@@ -24,6 +26,7 @@ public class AuthorsController : ControllerBase
     private readonly DemoContext _ctx;
     private readonly DemoRepository _repository;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger<AuthorsController> _logger;
     #endregion
 
     #region Конструктор
@@ -31,19 +34,22 @@ public class AuthorsController : ControllerBase
     /// Конструктор
     /// </summary>
     public AuthorsController(
-        
+
         LongPollingQuery<Author> longpolling,
-        DemoContext ctx, 
-        DemoRepository repository, 
-        IHttpClientFactory httpClientFactory)
-    {            
+        DemoContext ctx,
+        DemoRepository repository,
+        IHttpClientFactory httpClientFactory,
+        ILogger<AuthorsController> logger)
+    {
         _longpolling = longpolling;
         _ctx = ctx;
         _repository = repository;
         _httpClientFactory = httpClientFactory;
+        _logger = logger;
     }
     #endregion
 
+    #region TestTrace
     /// <summary>
     /// Тестовая функция с получением данных из "другого" микросервиса, с авторизацией
     /// </summary>        
@@ -58,15 +64,19 @@ public class AuthorsController : ControllerBase
         //var result = await responce.Content.ReadAsStringAsync();
         return _ctx.Authors;
     }
+    #endregion
 
     /// <summary>
     /// Получение всех авторов
     /// </summary>        
     [HttpGet("", Name = nameof(GetAllAuthors))]
-    public IQueryable<Author> GetAllAuthors() =>
-        _ctx.Authors
+    public IQueryable<Author> GetAllAuthors()
+    {        
+        return _ctx.Authors
+        .AsNoTracking()
         .Include(a => a.Books)
         .Include(a => a.Publishers);
+    }
 
 
     /// <summary>
@@ -208,7 +218,7 @@ public class AuthorsController : ControllerBase
     [HttpGet("TestDate", Name = nameof(TestDate))]
     public DateTime TestDate(DateTime dt)
     {
-      return dt;
+        return dt;
     }
 
 

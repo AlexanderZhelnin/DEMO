@@ -7,7 +7,7 @@
         <member name="T:Demo.BookAVG">
             Фоновый процесс расчёта среднего колличества отзывов 
         </member>
-        <member name="M:Demo.BookAVG.#ctor(Microsoft.Extensions.Logging.ILogger{Demo.BookAVG},Demo.Model.DemoContext)">
+        <member name="M:Demo.BookAVG.#ctor(Microsoft.Extensions.Logging.ILogger{Demo.BookAVG},Demo.DB.DemoContext)">
             <summary>
             Конструктор
             </summary>    
@@ -161,7 +161,7 @@
             Контроллер авторов
             </summary>
         </member>
-        <member name="M:Demo.Controllers.AuthorsController.#ctor(Demo.LongPollingQuery{Demo.Model.Author},Demo.Model.DemoContext,Demo.Model.DemoRepository,System.Net.Http.IHttpClientFactory)">
+        <member name="M:Demo.Controllers.AuthorsController.#ctor(Demo.LongPollingQuery{Demo.Models.Author},Demo.DB.DemoContext,Demo.DB.DemoRepository,System.Net.Http.IHttpClientFactory,Microsoft.Extensions.Logging.ILogger{Demo.Controllers.AuthorsController})">
             <summary>
             Конструктор
             </summary>
@@ -201,14 +201,14 @@
             <returns>коллекция результат</returns>
             <example>GET api/Authors/GetChanges/</example>
         </member>
-        <member name="M:Demo.Controllers.AuthorsController.CreateAuthor(Demo.Model.Author)">
+        <member name="M:Demo.Controllers.AuthorsController.CreateAuthor(Demo.Models.Author)">
             <summary>
             Создание нового автора
             </summary>
             <param name="author">новый автор</param>
             <example>POST api/Authors</example>
         </member>
-        <member name="M:Demo.Controllers.AuthorsController.UpdateAuthor(Demo.Model.Author)">
+        <member name="M:Demo.Controllers.AuthorsController.UpdateAuthor(Demo.Models.Author)">
             <summary>
             Изменение автора
             </summary>        
@@ -222,7 +222,7 @@
             <param name="id"></param>
             <example>DELETE api/Authors/1</example>
         </member>
-        <member name="M:Demo.Controllers.AuthorsController.UpsertAuthor(Demo.Model.Author)">
+        <member name="M:Demo.Controllers.AuthorsController.UpsertAuthor(Demo.Models.Author)">
             <summary>
             Создание нового автора
             </summary>
@@ -234,12 +234,36 @@
             Тестовая функция с получением данных из "другого" микросервиса, с авторизацией
             </summary>        
         </member>
+        <member name="T:Demo.Controllers.DTOController">
+            Пример контроллера для показа работы Mapster 
+        </member>
+        <member name="M:Demo.Controllers.DTOController.#ctor(MapsterMapper.IMapper,Demo.DB.DemoContext)">
+            <summary>
+            Конструктор
+            </summary>
+            <param name="mapper">мапинг</param>
+            <param name="ctx">контекст базы данных</param>
+        </member>
+        <member name="M:Demo.Controllers.DTOController.GetDTOAuthors">
+            <summary>
+            Получить авторов DTO
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Demo.Controllers.DTOController.GetAuthorDTOById(System.Int32)">
+            <summary>
+            Получить автора по уникальному идентификатору
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+            <example>GET api/Authors/1</example>
+        </member>
         <member name="T:Demo.Controllers.PublisherController">
             <summary>
             Контроллер издателей
             </summary>
         </member>
-        <member name="M:Demo.Controllers.PublisherController.#ctor(Demo.Model.DemoContext,System.Net.Http.IHttpClientFactory)">
+        <member name="M:Demo.Controllers.PublisherController.#ctor(Demo.DB.DemoContext,System.Net.Http.IHttpClientFactory)">
             <summary>
             Конструктор
             </summary>
@@ -265,7 +289,7 @@
             <returns></returns>
             <example>GET api/Publisher/1/Author</example>
         </member>
-        <member name="M:Demo.Controllers.PublisherController.CreatePublisher(Demo.Model.Publisher)">
+        <member name="M:Demo.Controllers.PublisherController.CreatePublisher(Demo.Models.Publisher)">
             <summary>
             Создание нового издательства
             </summary>
@@ -280,7 +304,7 @@
             <param name="authorId">Уникальный идентификатор автора</param>
             <example>POST api/Authors</example>
         </member>
-        <member name="M:Demo.Controllers.PublisherController.UpdatePublisher(Demo.Model.Publisher)">
+        <member name="M:Demo.Controllers.PublisherController.UpdatePublisher(Demo.Models.Publisher)">
             <summary>
             Изменение автора
             </summary>        
@@ -294,201 +318,53 @@
             <param name="id"></param>
             <example>DELETE api/Publisher/1</example>
         </member>
-        <member name="T:Demo.Model.DemoContext">
+        <member name="T:Demo.DB.DemoContext">
             
         </member>
-        <member name="M:Demo.Model.DemoContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions)">
+        <member name="M:Demo.DB.DemoContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions)">
             <summary>
             Констрктор DemoContext
             </summary>
             <param name="o">свойства контекста</param>
         </member>
-        <member name="P:Demo.Model.DemoContext.Authors">
+        <member name="P:Demo.DB.DemoContext.Authors">
             Авторы 
         </member>
-        <member name="P:Demo.Model.DemoContext.Books">
+        <member name="P:Demo.DB.DemoContext.Books">
             Книги 
         </member>
-        <member name="P:Demo.Model.DemoContext.Publishers">
+        <member name="P:Demo.DB.DemoContext.Publishers">
             Издательства 
         </member>
-        <member name="P:Demo.Model.DemoContext.BookDetails">
+        <member name="P:Demo.DB.DemoContext.BookDetails">
             Дополнительная информация по книге 
         </member>
-        <member name="P:Demo.Model.DemoContext.PublishersAuthors">
+        <member name="P:Demo.DB.DemoContext.PublishersAuthors">
             Связь многие ко многим между Издателями и Авторами 
         </member>
-        <member name="M:Demo.Model.DemoContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
+        <member name="M:Demo.DB.DemoContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <summary>
             Настройка свойств модели
             </summary>        
         </member>
-        <member name="T:Demo.Model.DemoRepository">
+        <member name="T:Demo.DB.DemoRepository">
             Демо репозиторий 
         </member>
-        <member name="M:Demo.Model.DemoRepository.#ctor(Demo.Model.DemoContext)">
+        <member name="M:Demo.DB.DemoRepository.#ctor(Demo.DB.DemoContext)">
             Конструктор 
         </member>
-        <member name="M:Demo.Model.DemoRepository.Get(System.Int32)">
+        <member name="M:Demo.DB.DemoRepository.Get(System.Int32)">
             <summary>
             Получить автора по иникальному идентификатору
             </summary>
             <param name="id">Уникальный идентификатор</param>
             <returns></returns>
         </member>
-        <member name="M:Demo.Model.DemoRepository.Update(Demo.Model.Author)">
+        <member name="M:Demo.DB.DemoRepository.Update(Demo.Models.Author)">
             <summary>
             Обновить автора
             </summary>
             <param name="author">автор для обновления</param>
-        </member>
-        <member name="T:Demo.Model.Author">
-            <summary>
-            Автор
-            </summary>
-        </member>
-        <member name="P:Demo.Model.Author.Id">
-            Уникальный идентификатор 
-        </member>
-        <member name="P:Demo.Model.Author.Name">
-            Имя автора 
-        </member>
-        <member name="P:Demo.Model.Author.Books">
-            Книги автора 
-        </member>
-        <member name="P:Demo.Model.Author.Publishers">
-            Издательства 
-        </member>
-        <member name="P:Demo.Model.Author.PublishersAuthors">
-            Связь многие ко многим Издатели/Авторы 
-        </member>
-        <member name="T:Demo.Model.Book">
-            Книга 
-        </member>
-        <member name="P:Demo.Model.Book.Id">
-            Уникальный идентификатор 
-        </member>
-        <member name="P:Demo.Model.Book.Title">
-            Название книги 
-        </member>
-        <member name="P:Demo.Model.Book.Description">
-            Описание книги 
-        </member>
-        <member name="P:Demo.Model.Book.ImageUrl">
-            Обложка 
-        </member>
-        <member name="P:Demo.Model.Book.AuthorId">
-            Уникльный идентификатор автора 
-        </member>
-        <member name="P:Demo.Model.Book.Author">
-            Автор 
-        </member>
-        <member name="P:Demo.Model.Book.ISBN_10">
-            Идентификатор ISBN10 
-        </member>
-        <member name="P:Demo.Model.Book.ISBN_13">
-            Идентификатор ISBN13 
-        </member>
-        <member name="P:Demo.Model.Book.Details">
-            Дополнительная информация по книге 
-        </member>
-        <member name="T:Demo.Model.StatusEnum">
-            Статус книги 
-        </member>
-        <member name="F:Demo.Model.StatusEnum.complite">
-            Книга завершена 
-        </member>
-        <member name="F:Demo.Model.StatusEnum.write">
-            Книга пишется 
-        </member>
-        <member name="T:Demo.Model.LanguageEnum">
-            Язык 
-        </member>
-        <member name="F:Demo.Model.LanguageEnum.ru">
-            Русский 
-        </member>
-        <member name="F:Demo.Model.LanguageEnum.en">
-            Английский 
-        </member>
-        <member name="T:Demo.Model.GenreEnum">
-            Жанр книги 
-        </member>
-        <member name="F:Demo.Model.GenreEnum.fantastic">
-            Фантастика 
-        </member>
-        <member name="F:Demo.Model.GenreEnum.fantasy">
-            Фантази 
-        </member>
-        <member name="F:Demo.Model.GenreEnum.litrpg">
-            litRPG 
-        </member>
-        <member name="F:Demo.Model.GenreEnum.scientific">
-            Научная литература 
-        </member>
-        <member name="F:Demo.Model.GenreEnum.historical">
-            Историческая литература 
-        </member>
-        <member name="T:Demo.Model.BookDetails">
-             Дополнительная информация по книге 
-        </member>
-        <member name="P:Demo.Model.BookDetails.BookId">
-            Уникальный идентификатор 
-        </member>
-        <member name="P:Demo.Model.BookDetails.Book">
-            Книга 
-        </member>
-        <member name="P:Demo.Model.BookDetails.Rank">
-            Ранк книги 
-        </member>
-        <member name="P:Demo.Model.BookDetails.Status">
-            Статус книги 
-        </member>
-        <member name="P:Demo.Model.BookDetails.PeperbackCost">
-            Стоимость книги в мягком переплёте 
-        </member>
-        <member name="P:Demo.Model.BookDetails.HardcoverCost">
-            Стоимость книги в твёрдом переплёте 
-        </member>
-        <member name="P:Demo.Model.BookDetails.Year">
-            Дата выпуска 
-        </member>
-        <member name="P:Demo.Model.BookDetails.Editor">
-            Редакция 
-        </member>
-        <member name="P:Demo.Model.BookDetails.Illustrator">
-            иллюстратор 
-        </member>
-        <member name="P:Demo.Model.BookDetails.PageCount">
-            Колличество страниц 
-        </member>
-        <member name="P:Demo.Model.BookDetails.Language">
-            Язык 
-        </member>
-        <member name="P:Demo.Model.BookDetails.ReadingAge">
-            Возростные ограничения 
-        </member>
-        <member name="P:Demo.Model.BookDetails.Genre">
-            Жанр 
-        </member>
-        <member name="P:Demo.Model.BookDetails.Reviews">
-            Отзывы 
-        </member>
-        <member name="T:Demo.Model.Publisher">
-            <summary>
-            Издатель
-            </summary>
-        </member>
-        <member name="P:Demo.Model.Publisher.Id">
-            Уникальный идентификатор 
-        </member>
-        <member name="P:Demo.Model.Publisher.Name">
-            Название издателя 
-        </member>
-        <member name="P:Demo.Model.Publisher.Authors">
-            Авторы 
-        </member>
-        <member name="P:Demo.Model.Publisher.PublishersAuthors">
-            Связь многие ко многим Издатели/Авторы 
         </member>
         <member name="T:Demo.Filters.ExceptionFilter">
             <summary>
@@ -507,7 +383,7 @@
             Главное отличие в том что подзапросы выполняются последовательно, в том же порядке что указано в запросе
             </summary>
         </member>
-        <member name="M:Demo.GraphQl.Mutation.Create(Demo.Model.Author,Demo.Model.DemoContext)">
+        <member name="M:Demo.GraphQl.Mutation.Create(Demo.Models.Author,Demo.DB.DemoContext)">
             <summary>
             Создание автора
             </summary>
@@ -515,7 +391,7 @@
             <param name="ctx">Контекст базы данных Entity</param>
             <returns>Автор</returns>        
         </member>
-        <member name="M:Demo.GraphQl.Mutation.Update(Demo.Model.Author,Demo.Model.DemoContext)">
+        <member name="M:Demo.GraphQl.Mutation.Update(Demo.Models.Author,Demo.DB.DemoContext)">
             <summary>
             Обновление автора
             </summary>
@@ -523,7 +399,7 @@
             <param name="ctx">Контекст базы данных Entity</param>
             <returns>Автор</returns>        
         </member>
-        <member name="M:Demo.GraphQl.Mutation.Delete(System.Int32,Demo.Model.DemoContext)">
+        <member name="M:Demo.GraphQl.Mutation.Delete(System.Int32,Demo.DB.DemoContext)">
             <summary>
             Удаление автора
             </summary>
@@ -531,7 +407,7 @@
             <param name="ctx">Контекст базы данных Entity</param>
             <returns>Автор</returns>        
         </member>
-        <member name="M:Demo.GraphQl.Mutation.CreateOrUpdate(Demo.Model.Author,Demo.Model.DemoContext,HotChocolate.Subscriptions.ITopicEventSender)">
+        <member name="M:Demo.GraphQl.Mutation.CreateOrUpdate(Demo.Models.Author,Demo.DB.DemoContext,HotChocolate.Subscriptions.ITopicEventSender)">
             <summary>
             Создать или обновить автора тут логика такая, если Id равен 0, то это однозначно новый автор
             </summary>
@@ -570,7 +446,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Demo.GraphQl.Query.MyLogicPaginAuthors(System.String,System.Nullable{System.Int32},System.String,Demo.Model.DemoContext)">
+        <member name="M:Demo.GraphQl.Query.MyLogicPaginAuthors(System.String,System.Nullable{System.Int32},System.String,Demo.DB.DemoContext)">
             <summary>
             
             </summary>
@@ -579,14 +455,14 @@
             <param name="sortBy"></param>
             <returns></returns>
         </member>
-        <member name="M:Demo.GraphQl.Query.Authors(Demo.Model.DemoContext)">
+        <member name="M:Demo.GraphQl.Query.Authors(Demo.DB.DemoContext)">
             <summary>
             Запрос чтения
             </summary>
             <param name="ctx">Контекст базы данных Entity</param>            
             <returns>Авторы</returns>        
         </member>
-        <member name="M:Demo.GraphQl.Query.AuthorsByIds(Demo.Model.DemoContext,System.Collections.Generic.IEnumerable{System.Int32})">
+        <member name="M:Demo.GraphQl.Query.AuthorsByIds(Demo.DB.DemoContext,System.Collections.Generic.IEnumerable{System.Int32})">
             <summary>
             Чтение по уникальным идентификаторам, это функция по факту не нужна, легко заменяется функцией Authors с фильтром
             </summary>
@@ -594,7 +470,7 @@
             <param name="ids"></param>
             <returns>Авторы</returns>           
         </member>
-        <member name="M:Demo.GraphQl.Query.AuthorById(Demo.Model.DemoContext,System.Int32)">
+        <member name="M:Demo.GraphQl.Query.AuthorById(Demo.DB.DemoContext,System.Int32)">
             <summary>
             Получить автора по иникальному идентификатору
             </summary>
@@ -603,7 +479,7 @@
             <returns>Автор книги</returns>
             <exception cref="T:System.ArgumentException"></exception>
         </member>
-        <member name="M:Demo.GraphQl.Query.Books(Demo.Model.DemoContext)">
+        <member name="M:Demo.GraphQl.Query.Books(Demo.DB.DemoContext)">
             <summary>
             Запрос получения книг
             </summary>
@@ -644,7 +520,7 @@
         <member name="M:Demo.GraphQl.Query.TestConfigurationDB">
             Проверяем работу значений из базы данных 
         </member>
-        <member name="M:Demo.GraphQl.Api1.Authors(Demo.Model.DemoContext)">
+        <member name="M:Demo.GraphQl.Api1.Authors(Demo.DB.DemoContext)">
             <summary>
             Запрос чтения
             </summary>
@@ -656,7 +532,7 @@
             Подписки
             </summary>
         </member>
-        <member name="M:Demo.GraphQl.Subscription.OnAuthorChanged(Demo.Model.Author)">
+        <member name="M:Demo.GraphQl.Subscription.OnAuthorChanged(Demo.Models.Author)">
             <summary>
             Добавлен новый автор
             </summary>
@@ -740,6 +616,178 @@
             </summary>
             <param name="marker">маркер после которого происходит чтение данных из очереди</param>        
             <returns></returns>
+        </member>
+        <member name="T:Demo.IAuthorMapper">
+            <summary>
+            Интерфейс для генерации сопоставления
+            </summary>
+        </member>
+        <member name="T:Demo.Mappers.RegisterMapper">
+            <summary>
+            Регистрация сопоставления
+            </summary>
+        </member>
+        <member name="M:Demo.Mappers.RegisterMapper.Register(Mapster.TypeAdapterConfig)">
+            
+        </member>
+        <member name="T:Demo.Models.Author">
+            <summary>
+            Автор
+            </summary>
+        </member>
+        <member name="P:Demo.Models.Author.Id">
+            Уникальный идентификатор 
+        </member>
+        <member name="P:Demo.Models.Author.Name">
+            Имя автора 
+        </member>
+        <member name="P:Demo.Models.Author.Books">
+            Книги автора 
+        </member>
+        <member name="P:Demo.Models.Author.Publishers">
+            Издательства 
+        </member>
+        <member name="P:Demo.Models.Author.PublishersAuthors">
+            Связь многие ко многим Издатели/Авторы 
+        </member>
+        <member name="T:Demo.Models.AuthorDTO">
+            <summary>
+            Автор для передачи данных
+            </summary>
+        </member>
+        <member name="P:Demo.Models.AuthorDTO.Id">
+            Уникальный идентификатор 
+        </member>
+        <member name="P:Demo.Models.AuthorDTO.Name">
+            Имя автора 
+        </member>
+        <member name="T:Demo.Models.Book">
+            Книга 
+        </member>
+        <member name="P:Demo.Models.Book.Id">
+            Уникальный идентификатор 
+        </member>
+        <member name="P:Demo.Models.Book.Title">
+            Название книги 
+        </member>
+        <member name="P:Demo.Models.Book.Description">
+            Описание книги 
+        </member>
+        <member name="P:Demo.Models.Book.ImageUrl">
+            Обложка 
+        </member>
+        <member name="P:Demo.Models.Book.AuthorId">
+            Уникльный идентификатор автора 
+        </member>
+        <member name="P:Demo.Models.Book.Author">
+            Автор 
+        </member>
+        <member name="P:Demo.Models.Book.ISBN_10">
+            Идентификатор ISBN10 
+        </member>
+        <member name="P:Demo.Models.Book.ISBN_13">
+            Идентификатор ISBN13 
+        </member>
+        <member name="P:Demo.Models.Book.Details">
+            Дополнительная информация по книге 
+        </member>
+        <member name="T:Demo.Models.StatusEnum">
+            Статус книги 
+        </member>
+        <member name="F:Demo.Models.StatusEnum.complite">
+            Книга завершена 
+        </member>
+        <member name="F:Demo.Models.StatusEnum.write">
+            Книга пишется 
+        </member>
+        <member name="T:Demo.Models.LanguageEnum">
+            Язык 
+        </member>
+        <member name="F:Demo.Models.LanguageEnum.ru">
+            Русский 
+        </member>
+        <member name="F:Demo.Models.LanguageEnum.en">
+            Английский 
+        </member>
+        <member name="T:Demo.Models.GenreEnum">
+            Жанр книги 
+        </member>
+        <member name="F:Demo.Models.GenreEnum.fantastic">
+            Фантастика 
+        </member>
+        <member name="F:Demo.Models.GenreEnum.fantasy">
+            Фантази 
+        </member>
+        <member name="F:Demo.Models.GenreEnum.litrpg">
+            litRPG 
+        </member>
+        <member name="F:Demo.Models.GenreEnum.scientific">
+            Научная литература 
+        </member>
+        <member name="F:Demo.Models.GenreEnum.historical">
+            Историческая литература 
+        </member>
+        <member name="T:Demo.Models.BookDetails">
+             Дополнительная информация по книге 
+        </member>
+        <member name="P:Demo.Models.BookDetails.BookId">
+            Уникальный идентификатор 
+        </member>
+        <member name="P:Demo.Models.BookDetails.Book">
+            Книга 
+        </member>
+        <member name="P:Demo.Models.BookDetails.Rank">
+            Ранк книги 
+        </member>
+        <member name="P:Demo.Models.BookDetails.Status">
+            Статус книги 
+        </member>
+        <member name="P:Demo.Models.BookDetails.PeperbackCost">
+            Стоимость книги в мягком переплёте 
+        </member>
+        <member name="P:Demo.Models.BookDetails.HardcoverCost">
+            Стоимость книги в твёрдом переплёте 
+        </member>
+        <member name="P:Demo.Models.BookDetails.Year">
+            Дата выпуска 
+        </member>
+        <member name="P:Demo.Models.BookDetails.Editor">
+            Редакция 
+        </member>
+        <member name="P:Demo.Models.BookDetails.Illustrator">
+            иллюстратор 
+        </member>
+        <member name="P:Demo.Models.BookDetails.PageCount">
+            Колличество страниц 
+        </member>
+        <member name="P:Demo.Models.BookDetails.Language">
+            Язык 
+        </member>
+        <member name="P:Demo.Models.BookDetails.ReadingAge">
+            Возростные ограничения 
+        </member>
+        <member name="P:Demo.Models.BookDetails.Genre">
+            Жанр 
+        </member>
+        <member name="P:Demo.Models.BookDetails.Reviews">
+            Отзывы 
+        </member>
+        <member name="T:Demo.Models.Publisher">
+            <summary>
+            Издатель
+            </summary>
+        </member>
+        <member name="P:Demo.Models.Publisher.Id">
+            Уникальный идентификатор 
+        </member>
+        <member name="P:Demo.Models.Publisher.Name">
+            Название издателя 
+        </member>
+        <member name="P:Demo.Models.Publisher.Authors">
+            Авторы 
+        </member>
+        <member name="P:Demo.Models.Publisher.PublishersAuthors">
+            Связь многие ко многим Издатели/Авторы 
         </member>
         <member name="T:Demo.Program">
             

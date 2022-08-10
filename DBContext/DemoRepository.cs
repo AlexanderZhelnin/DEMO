@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Demo.Models;
+using System;
 using System.Linq;
 
-namespace Demo.Model;
+namespace Demo.DB;
 
 /** Демо репозиторий */
 public class DemoRepository

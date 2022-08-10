@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using Demo.Model;
+using Demo.Models;
 using Microsoft.EntityFrameworkCore;
 using Demo.GraphQl;
 using Demo.Filters;
@@ -32,6 +32,18 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Hosting.Internal;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using HotChocolate.Execution.Batching;
+using HotChocolate.AspNetCore.Serialization;
+using HotChocolate.Language;
+using Mapster;
+using Demo.Controllers;
+using System.Linq.Expressions;
+using ExpressionDebugger;
+using MapsterMapper;
+using Demo.DB;
+using System.Runtime.Serialization;
+using Demo.Mappers;
 
 namespace Demo;
 
@@ -188,7 +200,6 @@ public class SettingsWatchdog
 }
 #endregion
 
-
 #region OAUTHSettings
 public class OAUTHSettings
 {
@@ -197,6 +208,18 @@ public class OAUTHSettings
 }
 #endregion
 
+public class AuthorType : ObjectType<Author>
+{
+    protected override void Configure(IObjectTypeDescriptor<Author> descriptor)
+    {
+        // this defines that fields shall only be defined explicitly
+        //descriptor.BindFieldsExplicitly();
+        descriptor.BindFieldsImplicitly();
+
+        // now declare the fields that you want to define.
+        //descriptor.Field(t => t.Bar);
+    }
+}
 
 /** **/
 [ExcludeFromCodeCoverage]
@@ -230,6 +253,21 @@ public class Startup
     }
     #endregion
 
+    private static TypeAdapterConfig GetConfiguredMappingConfig()
+    {
+        var config = new TypeAdapterConfig
+        {
+            Compiler = exp => exp.CompileWithDebugInfo(new ExpressionCompilationOptions
+            {
+                EmitFile = true,
+                ThrowOnFailedCompilation = true
+            })
+        };
+
+        new RegisterMapper().Register(config);
+       
+        return config;
+    }
 
     /** Конфигурация сервисов **/
     public void ConfigureServices(IServiceCollection services)
@@ -268,7 +306,11 @@ public class Startup
         services.AddTransient<DemoRepository>();
         //Добавляем в DI конвеер обрабочик запроса, в режиме новый для каждого запроса
         services.AddTransient<HttpTrackerHandler>();
-
+        
+        //Добавляем конфигурацию Mapster
+        services.AddSingleton(GetConfiguredMappingConfig());
+        //Добавляем преобразователь Mapster
+        services.AddScoped<IMapper, ServiceMapper>();
         #endregion
 
         #region Добавляем конфигурацию авторизации
@@ -316,6 +358,7 @@ public class Startup
                 })
                 ;
         //.AddJsonOptions(o =>
+
         //{
         //    o.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
         //}); 
@@ -417,6 +460,8 @@ public class Startup
         //#endif 
         #endregion
 
+        services.AddHttpResultSerializer(batchSerialization: HttpResultSerialization.JsonArray);
+
         #region Региструруем GraphQL
         services
             //подписки в памяти
@@ -432,6 +477,7 @@ public class Startup
             .AddDefaultTransactionScopeHandler()
 #endif
         #endregion
+            .AddType<ExportDirectiveType>()
             //Авторизация
             .AddAuthorization()
             //Запросы
@@ -487,7 +533,7 @@ public class Startup
                         }
                         return er;
                     })
-        #endregion
+        #endregion           
             ;
         #endregion
 
@@ -533,4 +579,5 @@ public class Startup
         app.UseHealthChecks("/health", new HealthCheckOptions { ResponseWriter = WriteHealthCheckResponse });
     }
     #endregion
+
 }

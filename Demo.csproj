@@ -7,14 +7,15 @@
     <UserSecretsId>b7a1d7c8-f8b1-4ec6-a192-45531ffa65c8</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DocumentationFile>c:\Project\DEMO\DEMO\Demo.xml</DocumentationFile>
+    <RepositoryUrl>https://github.com/AlexanderZhelnin/DEMO</RepositoryUrl>    
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">    
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>$(DefineConstants)TRACE SQLITE</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>$(DefineConstants)TRACE SQLITE</DefineConstants>    
+    <DefineConstants>$(DefineConstants)TRACE SQLITE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,14 +31,20 @@
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="6.0.2" />
     <PackageReference Include="EFCore.NamingConventions" Version="6.0.0" />
+    <PackageReference Include="ExpressionDebugger" Version="2.2.1" />
     <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="6.0.1" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="12.7.0" />
-    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="12.7.0" />
-    <PackageReference Include="HotChocolate.Data" Version="12.7.0" />
-    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="12.7.0" />
-    <PackageReference Include="HotChocolate.PersistedQueries.InMemory" Version="12.7.0" />
-    <PackageReference Include="HotChocolate.Stitching" Version="12.7.0" />
-    <PackageReference Include="HotChocolate.Subscriptions.InMemory" Version="12.7.0" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="12.8.1" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="12.8.1" />
+    <PackageReference Include="HotChocolate.Data" Version="12.8.1" />
+    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="12.8.1" />
+    <PackageReference Include="HotChocolate.PersistedQueries.InMemory" Version="12.8.1" />
+    <PackageReference Include="HotChocolate.Stitching" Version="12.8.1" />
+    <PackageReference Include="HotChocolate.Subscriptions.InMemory" Version="12.8.1" />
+    <PackageReference Include="Mapster" Version="7.3.0" />
+    <PackageReference Include="Mapster.Async" Version="2.0.0" />
+    <PackageReference Include="Mapster.Core" Version="1.2.0" />
+    <PackageReference Include="Mapster.DependencyInjection" Version="1.0.0" />
+    <PackageReference Include="Mapster.EFCore" Version="5.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.4" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.4" />
@@ -48,11 +55,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.15.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.15.1" />
     <PackageReference Include="NetEscapades.Configuration.Yaml" Version="2.2.0" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.14.0" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.3" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0" />    
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.4" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.17.0" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     <PackageReference Include="System.Reactive" Version="5.0.0" />
@@ -67,6 +74,31 @@
     </None>
   </ItemGroup>
 
-  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
 
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties appsettings_1json__JsonSchema="" />
+    </VisualStudio>
+  </ProjectExtensions>
+
+  <ItemGroup>
+    <Generated Include="**\*.g.cs" />
+  </ItemGroup>
+  <Target Name="CleanGenerated" BeforeTargets="build">
+    <Delete Files="@(Generated)" />
+  </Target>
+  
+  <Target Name="Mapster" AfterTargets="AfterBuild">    
+    <Exec WorkingDirectory="$(ProjectDir)" Command="dotnet tool restore" />
+    <Exec WorkingDirectory="$(ProjectDir)" Command="dotnet mapster model -a &quot;$(TargetDir)$(ProjectName).dll&quot;" />
+    <Exec WorkingDirectory="$(ProjectDir)" Command="dotnet mapster extension -a &quot;$(TargetDir)$(ProjectName).dll&quot;" />
+    <Exec WorkingDirectory="$(ProjectDir)" Command="dotnet mapster mapper -a &quot;$(TargetDir)$(ProjectName).dll&quot;" />
+  </Target>
+  <ItemGroup>
+    <Folder Include="Новая папка\" />
+  </ItemGroup>
+ 
 </Project>

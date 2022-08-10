@@ -2,7 +2,9 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using Demo.Configurations.DB;
 using Demo.Configurations.Dynamic;
-using Demo.Model;
+using Demo.Models;
+using ExpressionDebugger;
+using Mapster;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,7 +20,9 @@ public class Program
 {
     /** */
     public static void Main(string[] args)
-    {
+    {        
+        //var host = CreateHostBuilder(args).Build();
+        //host.Run();
 
         var logger = NLogBuilder
             .ConfigureNLog("nlog.config")
@@ -30,13 +34,13 @@ public class Program
             logger.Debug("Инициализация программы");
             var host = CreateHostBuilder(args).Build();
 #if !SQLITE
-                    using var scope = host.Services.CreateScope();
+                            using var scope = host.Services.CreateScope();
 
-                    scope
-                        .ServiceProvider
-                        .GetRequiredService<DemoContext>()
-                        .Database
-                        .Migrate();
+                            scope
+                                .ServiceProvider
+                                .GetRequiredService<DemoContext>()
+                                .Database
+                                .Migrate();
 
 #endif
             #endregion
@@ -60,7 +64,7 @@ public class Program
         Host.CreateDefaultBuilder(args)
             // Настраиваем конфигурацию
             .ConfigureAppConfiguration((appConfiguration) =>
-            {                
+            {
                 // пример подключения json
                 appConfiguration.AddJsonFile("settings.json", false, true);
 

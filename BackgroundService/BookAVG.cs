@@ -1,4 +1,5 @@
-﻿using Demo.Model;
+﻿using Demo.DB;
+using Demo.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

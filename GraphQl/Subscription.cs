@@ -1,4 +1,4 @@
-﻿using Demo.Model;
+﻿using Demo.Models;
 using HotChocolate;
 using HotChocolate.Types;
 
